@@ -19,6 +19,7 @@
 <c:set var="correo" value="${fn:trim(param.correo)}" />
 <c:set var="telefono" value="${empty param.telefono ? null : fn:trim(param.telefono)}" />
 <c:set var="semestre" value="${empty param.semestre ? null : fn:trim(param.semestre)}" />
+<c:set var="porcentajeCreditos" value="${empty param.porcentaje_creditos ? null : fn:trim(param.porcentaje_creditos)}" />
 <c:set var="activo" value="${param.activo == '1' ? 1 : 0}" />
 <c:set var="clave" value="${fn:trim(param.clave)}" />
 
@@ -26,6 +27,25 @@
 <c:if test="${empty idRol or empty codigo or empty documento or empty nombres or empty apellidos or empty correo or (!esEdicion and empty clave)}">
     <c:set var="mensaje_error" value="Todos los campos obligatorios (*) deben ser diligenciados." scope="session" />
     <c:redirect url="/admin/usuarios_formulario.jsp${esEdicion ? '?id='.concat(idUsuario) : ''}" />
+</c:if>
+
+<%-- 1.1 Validación de correo institucional (@uts.edu.co) --%>
+<c:set var="correoLower" value="${fn:toLowerCase(correo)}" />
+<c:if test="${not fn:endsWith(correoLower, '@uts.edu.co') or fn:length(correoLower) <= 11}">
+    <c:set var="mensaje_error" value="El correo electrónico debe ser institucional y terminar en @uts.edu.co." scope="session" />
+    <c:redirect url="/admin/usuarios_formulario.jsp${esEdicion ? '?id='.concat(idUsuario) : ''}" />
+</c:if>
+
+<%-- 1.2 Validación de % de créditos completados para ESTUDIANTE (>= 75%) --%>
+<sql:query var="qRolSel" dataSource="${conn}">
+    SELECT nombre_rol FROM roles WHERE id_rol = ?
+    <sql:param value="${idRol}" />
+</sql:query>
+<c:if test="${qRolSel.rowCount > 0 and qRolSel.rows[0].nombre_rol == 'ESTUDIANTE'}">
+    <c:if test="${empty porcentajeCreditos or porcentajeCreditos + 0 < 75 or porcentajeCreditos + 0 > 100}">
+        <c:set var="mensaje_error" value="No se permite registrar al estudiante: debe tener el 75% o más de créditos completados." scope="session" />
+        <c:redirect url="/admin/usuarios_formulario.jsp${esEdicion ? '?id='.concat(idUsuario) : ''}" />
+    </c:if>
 </c:if>
 
 <%-- 2. Verificación de duplicados (código, documento o correo) --%>

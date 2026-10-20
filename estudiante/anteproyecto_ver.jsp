@@ -134,28 +134,81 @@
                                 <p class="text-muted"><c:out value="${proy.resumen}" /></p>
                             </div>
 
-                            <!-- Acceso al documento Google Drive -->
-                            <div class="p-3 bg-light rounded-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
-                                <div>
-                                    <div class="fw-bold text-dark"><i class="bi bi-link-45deg fs-5"></i> Enlace al Documento Completo:</div>
-                                    <small class="text-muted text-break"><c:out value="${proy.enlace_documento}" /></small>
-                                </div>
-                                <a href="<c:out value='${proy.enlace_documento}' />" target="_blank" class="btn btn-outline-primary">
-                                    <i class="bi bi-box-arrow-up-right me-1"></i> Abrir en la Nube
-                                </a>
-                            </div>
-
-                            <c:if test="${not empty proy.enlace_documento_final}">
-                                <div class="p-3 bg-success-subtle border border-success-subtle rounded-3 d-flex flex-wrap justify-content-between align-items-center gap-2 mt-3">
-                                    <div>
-                                        <div class="fw-bold text-success"><i class="bi bi-file-earmark-check-fill fs-5"></i> Monografía / Documento Final:</div>
-                                        <small class="text-muted text-break"><c:out value="${proy.enlace_documento_final}" /></small>
+                            <!-- Acceso a los documentos cargados por Fases -->
+                            <h6 class="fw-bold text-secondary mb-2">Documentos Digitales en Nube por Fase:</h6>
+                            <div class="d-flex flex-column gap-2">
+                                <c:if test="${not empty proy.enlace_desprendible}">
+                                    <div class="p-3 bg-light rounded-3 d-flex flex-wrap justify-content-between align-items-center gap-2 border">
+                                        <div>
+                                            <div class="fw-bold text-dark"><i class="bi bi-receipt text-success me-1"></i> Fase 1 - Desprendible de Pago:</div>
+                                            <small class="text-muted text-break"><c:out value="${proy.enlace_desprendible}" /></small>
+                                        </div>
+                                        <a href="<c:out value='${proy.enlace_desprendible}' />" target="_blank" class="btn btn-sm btn-outline-success">
+                                            <i class="bi bi-box-arrow-up-right me-1"></i> Ver Desprendible
+                                        </a>
                                     </div>
-                                    <a href="<c:out value='${proy.enlace_documento_final}' />" target="_blank" class="btn btn-success">
-                                        <i class="bi bi-box-arrow-up-right me-1"></i> Ver Documento Final
-                                    </a>
-                                </div>
-                            </c:if>
+                                </c:if>
+
+                                <c:if test="${not empty proy.enlace_documento and proy.enlace_documento != 'PENDIENTE'}">
+                                    <div class="p-3 bg-light rounded-3 d-flex flex-wrap justify-content-between align-items-center gap-2 border">
+                                        <div>
+                                            <div class="fw-bold text-dark"><i class="bi bi-file-earmark-pdf-fill text-danger me-1"></i> Fase 2 - Propuesta Enviada al Director:</div>
+                                            <small class="text-muted text-break"><c:out value="${proy.enlace_documento}" /></small>
+                                        </div>
+                                        <a href="<c:out value='${proy.enlace_documento}' />" target="_blank" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-box-arrow-up-right me-1"></i> Abrir Propuesta
+                                        </a>
+                                    </div>
+                                </c:if>
+
+                                <c:if test="${not empty proy.enlace_aval_director}">
+                                    <div class="p-3 bg-light rounded-3 d-flex flex-wrap justify-content-between align-items-center gap-2 border">
+                                        <div>
+                                            <div class="fw-bold text-primary"><i class="bi bi-file-earmark-check-fill me-1"></i> Fase 3 - Revisión / Aval de Propuesta por Director:</div>
+                                            <small class="text-muted text-break"><c:out value="${proy.enlace_aval_director}" /></small>
+                                        </div>
+                                        <a href="<c:out value='${proy.enlace_aval_director}' />" target="_blank" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-box-arrow-up-right me-1"></i> Ver Aval Director
+                                        </a>
+                                    </div>
+                                </c:if>
+
+                                <c:if test="${not empty proy.enlace_documento_final}">
+                                    <div class="p-3 bg-success-subtle border border-success-subtle rounded-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
+                                        <div>
+                                            <div class="fw-bold text-success"><i class="bi bi-file-earmark-check-fill me-1"></i> Fase 4 - Informe del Proyecto Enviado al Director:</div>
+                                            <small class="text-muted text-break"><c:out value="${proy.enlace_documento_final}" /></small>
+                                        </div>
+                                        <a href="<c:out value='${proy.enlace_documento_final}' />" target="_blank" class="btn btn-sm btn-success">
+                                            <i class="bi bi-box-arrow-up-right me-1"></i> Ver Informe del Proyecto
+                                        </a>
+                                    </div>
+                                </c:if>
+
+                                <c:if test="${not empty proy.enlace_informe_director}">
+                                    <div class="p-3 bg-light rounded-3 d-flex flex-wrap justify-content-between align-items-center gap-2 border">
+                                        <div>
+                                            <div class="fw-bold text-primary"><i class="bi bi-send-check-fill me-1"></i> Fase 5 - Informe Avalado por Director para Comité:</div>
+                                            <small class="text-muted text-break"><c:out value="${proy.enlace_informe_director}" /></small>
+                                        </div>
+                                        <a href="<c:out value='${proy.enlace_informe_director}' />" target="_blank" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-box-arrow-up-right me-1"></i> Ver Aval de Informe
+                                        </a>
+                                    </div>
+                                </c:if>
+
+                                <c:if test="${not empty proy.enlace_acta_final}">
+                                    <div class="p-3 bg-warning-subtle border border-warning rounded-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
+                                        <div>
+                                            <div class="fw-bold text-dark"><i class="bi bi-trophy-fill text-warning me-1"></i> Fase 6 - Acta / Dictamen Final del Comité Evaluador:</div>
+                                            <small class="text-muted text-break"><c:out value="${proy.enlace_acta_final}" /></small>
+                                        </div>
+                                        <a href="<c:out value='${proy.enlace_acta_final}' />" target="_blank" class="btn btn-sm btn-dark">
+                                            <i class="bi bi-box-arrow-up-right me-1"></i> Ver Acta Final
+                                        </a>
+                                    </div>
+                                </c:if>
+                            </div>
                         </div>
                     </div>
                 </div>

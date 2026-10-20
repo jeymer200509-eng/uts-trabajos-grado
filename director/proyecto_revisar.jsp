@@ -37,6 +37,16 @@
 </c:if>
 
 <c:set var="p" value="${qProy.rows[0]}" />
+<c:set var="esFaseInforme" value="${not empty p.enlace_documento_final or p.estado == 'Documento final entregado'}" />
+
+<%-- Consultar evaluadores activos para remitir al Comité Evaluador --%>
+<sql:query var="qEvaluadores" dataSource="${conn}">
+    SELECT u.id_usuario, u.nombres, u.apellidos, u.correo
+    FROM usuarios u
+    INNER JOIN roles r ON u.id_rol = r.id_rol AND r.nombre_rol = 'EVALUADOR'
+    WHERE u.activo = 1
+    ORDER BY u.nombres ASC
+</sql:query>
 
 <%-- Consultar historial de calificaciones previas --%>
 <sql:query var="qHistNotas" dataSource="${conn}">
@@ -49,7 +59,7 @@
     <sql:param value="${idProyecto}" />
 </sql:query>
 
-<c:set var="pageTitle" value="Revisión de Proyecto - Director UTS" />
+<c:set var="pageTitle" value="Revisión de Proyecto y Envío al Comité - Director UTS" />
 <%@ include file="/includes/header.jspf" %>
 <%@ include file="/includes/navbar.jspf" %>
 
@@ -57,11 +67,14 @@
     <!-- Encabezado -->
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
         <div>
+            <span class="badge bg-primary rounded-pill px-3 py-2 me-2">
+                <c:out value="${esFaseInforme ? 'FASE 5: Revisión de Informe del Proyecto' : 'FASE 3: Revisión de Propuesta'}" />
+            </span>
             <span class="badge badge-estado badge-estado-${fn:replace(fn:toLowerCase(p.estado), ' ', '-')} fs-6 mb-2">
                 <c:out value="${p.estado}" />
             </span>
             <h2 class="fw-bold mb-1 text-dark"><c:out value="${p.titulo}" /></h2>
-            <p class="text-secondary mb-0">Revisión tutoral del trabajo de grado &bull; Estudiante: <strong><c:out value="${p.nom_est} ${p.ape_est}" /></strong></p>
+            <p class="text-secondary mb-0">Revisión del Director y remisión al Comité Evaluador &bull; Estudiante: <strong><c:out value="${p.nom_est} ${p.ape_est}" /></strong></p>
         </div>
         <div>
             <a href="${pageContext.request.contextPath}/director/proyectos_listar.jsp" class="btn btn-outline-secondary">
@@ -71,7 +84,7 @@
     </div>
 
     <div class="row g-4">
-        <!-- Columna Izquierda: Información del Estudiante y Documento -->
+        <!-- Columna Izquierda: Información del Estudiante y Documentos por Fase -->
         <div class="col-lg-7">
             <!-- Ficha del Estudiante -->
             <div class="card card-uts shadow-sm mb-4 border-start border-4 border-start-primary">
@@ -108,10 +121,10 @@
                 </div>
             </div>
 
-            <!-- Contenido del Proyecto -->
+            <!-- Contenido del Proyecto y Documentos Subidos -->
             <div class="card card-uts shadow-sm mb-4">
                 <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-                    <h6 class="mb-0 fw-bold text-dark"><i class="bi bi-file-earmark-text text-success me-2"></i>Detalle de la Propuesta (v<c:out value="${p.version}" />)</h6>
+                    <h6 class="mb-0 fw-bold text-dark"><i class="bi bi-file-earmark-text text-success me-2"></i>Detalle de la Propuesta e Informe (v<c:out value="${p.version}" />)</h6>
                     <span class="badge bg-light text-secondary border"><i class="bi bi-tag"></i> <c:out value="${p.linea_investigacion}" /></span>
                 </div>
                 <div class="card-body p-4">
@@ -135,28 +148,45 @@
                         <p class="text-muted small"><c:out value="${p.resumen}" /></p>
                     </div>
 
-                    <!-- Enlace directo al documento digital en Drive -->
-                    <div class="p-3 bg-light rounded-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
+                    <hr class="my-3">
+                    <h6 class="fw-bold text-dark mb-2"><i class="bi bi-folder2-open text-primary me-1"></i>Documentos Digitales para Revisar:</h6>
+
+                    <!-- Fase 1: Desprendible de Pago -->
+                    <c:if test="${not empty p.enlace_desprendible}">
+                        <div class="p-3 bg-light rounded-3 d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2 border">
+                            <div>
+                                <div class="fw-bold text-dark"><i class="bi bi-receipt text-success me-2"></i>Fase 1: Desprendible de Pago del Estudiante:</div>
+                                <small class="text-muted text-break"><c:out value="${p.enlace_desprendible}" /></small>
+                            </div>
+                            <a href="<c:out value='${p.enlace_desprendible}' />" target="_blank" class="btn btn-sm btn-outline-success">
+                                <i class="bi bi-box-arrow-up-right me-1"></i> Ver Desprendible
+                            </a>
+                        </div>
+                    </c:if>
+
+                    <!-- Fase 2: Documento de la Propuesta -->
+                    <div class="p-3 bg-light rounded-3 d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2 border">
                         <div>
-                            <div class="fw-bold text-dark"><i class="bi bi-cloud-arrow-down-fill text-primary me-2"></i>Documento del Anteproyecto:</div>
+                            <div class="fw-bold text-dark"><i class="bi bi-cloud-arrow-down-fill text-primary me-2"></i>Fase 2: Propuesta de Grado Enviada por Estudiante:</div>
                             <small class="text-muted text-break"><c:out value="${p.enlace_documento}" /></small>
                         </div>
-                        <a href="<c:out value='${p.enlace_documento}' />" target="_blank" class="btn btn-outline-primary">
-                            <i class="bi bi-box-arrow-up-right me-1"></i> Abrir en Nube
+                        <a href="<c:out value='${p.enlace_documento}' />" target="_blank" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-box-arrow-up-right me-1"></i> Abrir Propuesta
                         </a>
                     </div>
 
+                    <!-- Fase 4: Informe del Proyecto -->
                     <c:if test="${not empty p.enlace_documento_final}">
-                        <div class="p-3 bg-success-subtle border border-success-subtle rounded-3 d-flex flex-wrap justify-content-between align-items-center gap-2 mt-3">
+                        <div class="p-3 bg-success-subtle border border-success-subtle rounded-3 d-flex flex-wrap justify-content-between align-items-center gap-2 mt-2">
                             <div>
-                                <div class="fw-bold text-success"><i class="bi bi-file-earmark-check-fill me-2"></i>Monografía / Entrega Final Radicada:</div>
+                                <div class="fw-bold text-success"><i class="bi bi-file-earmark-check-fill me-2"></i>Fase 4: Informe Final del Proyecto Subido por Estudiante:</div>
                                 <small class="text-muted text-break"><c:out value="${p.enlace_documento_final}" /></small>
                                 <c:if test="${not empty p.resumen_documento_final}">
-                                    <div class="small text-muted mt-2"><strong>Resultados:</strong> <c:out value="${p.resumen_documento_final}" /></div>
+                                    <div class="small text-muted mt-2"><strong>Resumen del Informe:</strong> <c:out value="${p.resumen_documento_final}" /></div>
                                 </c:if>
                             </div>
-                            <a href="<c:out value='${p.enlace_documento_final}' />" target="_blank" class="btn btn-success">
-                                <i class="bi bi-box-arrow-up-right me-1"></i> Abrir Monografía
+                            <a href="<c:out value='${p.enlace_documento_final}' />" target="_blank" class="btn btn-sm btn-success">
+                                <i class="bi bi-box-arrow-up-right me-1"></i> Abrir Informe del Proyecto
                             </a>
                         </div>
                     </c:if>
@@ -164,37 +194,65 @@
             </div>
         </div>
 
-        <!-- Columna Derecha: Formulario de Calificación y Dictamen -->
+        <!-- Columna Derecha: Formulario de Revisión y Envío al Comité Evaluador -->
         <div class="col-lg-5">
             <div class="card card-uts shadow-sm mb-4">
                 <div class="card-header card-header-uts py-3">
-                    <h5 class="mb-0 fw-bold"><i class="bi bi-pencil-square me-2"></i>Emisión de Concepto y Calificación</h5>
+                    <h5 class="mb-0 fw-bold">
+                        <i class="bi bi-send-check-fill me-2"></i>
+                        <c:out value="${esFaseInforme ? 'Fase 5: Revisar Informe y Enviar al Comité Evaluador' : 'Fase 3: Revisar Propuesta y Enviar al Comité Evaluador'}" />
+                    </h5>
                 </div>
                 <div class="card-body p-4">
                     <form action="${pageContext.request.contextPath}/director/proyecto_calificar.jsp" method="POST">
                         <input type="hidden" name="id_anteproyecto" value="${p.id_anteproyecto}">
                         <input type="hidden" name="estado_actual" value="${p.estado}">
-                        <input type="hidden" name="tiene_evaluador" value="${not empty p.id_evaluador ? '1' : '0'}">
 
                         <div class="mb-3">
                             <label for="tipo_evaluacion" class="form-label fw-semibold">
-                                <span class="text-danger">*</span> Tipo de Evaluación:
+                                <span class="text-danger">*</span> Etapa a Revisar:
                             </label>
                             <select name="tipo_evaluacion" id="tipo_evaluacion" class="form-select" required>
-                                <option value="Anteproyecto - Director" ${p.estado != 'Documento final entregado' ? 'selected' : ''}>
-                                    Evaluación de Anteproyecto
+                                <option value="Anteproyecto - Director" ${!esFaseInforme ? 'selected' : ''}>
+                                    Fase 3: Revisión de Propuesta y Envío al Comité Evaluador
                                 </option>
-                                <c:if test="${not empty p.enlace_documento_final or p.estado == 'Documento final entregado'}">
+                                <c:if test="${esFaseInforme}">
                                     <option value="Documento Final - Director" selected>
-                                        Evaluación de Documento Final / Monografía
+                                        Fase 5: Revisión de Informe del Proyecto y Envío al Comité Evaluador
                                     </option>
                                 </c:if>
                             </select>
                         </div>
 
                         <div class="mb-3">
+                            <label for="id_evaluador" class="form-label fw-semibold">
+                                <span class="text-danger">*</span> Comité Evaluador (Docente Evaluador Destino):
+                            </label>
+                            <select name="id_evaluador" id="id_evaluador" class="form-select" required>
+                                <option value="">-- Seleccione Docente del Comité Evaluador --</option>
+                                <c:forEach var="eva" items="${qEvaluadores.rows}">
+                                    <option value="${eva.id_usuario}" ${p.id_evaluador == eva.id_usuario ? 'selected' : ''}>
+                                        Prof. <c:out value="${eva.nombres} ${eva.apellidos}" /> (<c:out value="${eva.correo}" />)
+                                    </option>
+                                </c:forEach>
+                            </select>
+                            <div class="form-text">Si aprueba el documento, se remitirá automáticamente a este miembro del Comité Evaluador.</div>
+                        </div>
+
+                        <div class="mb-3 p-3 bg-light rounded-3 border">
+                            <label for="enlace_documento_director" class="form-label fw-semibold text-dark">
+                                <i class="bi bi-cloud-arrow-up-fill text-primary me-1"></i>Subir Archivo de Revisión / Aval del Director (Link PDF Drive/Nube):
+                            </label>
+                            <input type="url" class="form-control" id="enlace_documento_director" name="enlace_documento_director"
+                                   value="<c:out value='${esFaseInforme ? p.enlace_informe_director : p.enlace_aval_director}' />"
+                                   placeholder="https://drive.google.com/file/d/... (Carta de aval o documento revisado)"
+                                   oninput="validarUrlDocumento(this)">
+                            <div class="form-text">Adjunte el enlace al documento de aval o revisión para el Comité Evaluador.</div>
+                        </div>
+
+                        <div class="mb-3">
                             <label for="nota" class="form-label fw-semibold">
-                                <span class="text-danger">*</span> Calificación (Escala 0.0 a 5.0):
+                                <span class="text-danger">*</span> Calificación del Director (Escala 0.0 a 5.0):
                             </label>
                             <div class="input-group input-group-lg">
                                 <span class="input-group-text bg-light fw-bold">Nota</span>
@@ -206,11 +264,11 @@
 
                         <div class="mb-3">
                             <label for="estado_decision" class="form-label fw-semibold">
-                                <span class="text-danger">*</span> Decisión / Concepto Tutoral:
+                                <span class="text-danger">*</span> Decisión del Director:
                             </label>
                             <select name="estado_decision" id="estado_decision" class="form-select form-select-lg" required>
-                                <option value="Aprobado">Aprobado (Aprobar y remitir a evaluador)</option>
-                                <option value="Devuelto">Devuelto con Observaciones (Requiere corrección del estudiante)</option>
+                                <option value="Aprobado">Aprobar y Enviar al Comité Evaluador</option>
+                                <option value="Devuelto">Devolver con Observaciones (Requiere corrección del estudiante)</option>
                             </select>
                         </div>
 
@@ -218,12 +276,12 @@
                             <label for="observaciones" class="form-label fw-semibold">
                                 <span class="text-danger">*</span> Observaciones y Retroalimentación:
                             </label>
-                            <textarea class="form-control" id="observaciones" name="observaciones" rows="5" required 
-                                      placeholder="Escriba aquí los comentarios detallados, aspectos a corregir o fortalezas encontradas en el documento..."></textarea>
+                            <textarea class="form-control" id="observaciones" name="observaciones" rows="4" required 
+                                      placeholder="Escriba aquí los comentarios detallados para el Comité Evaluador o los aspectos a corregir por el estudiante..."></textarea>
                         </div>
 
-                        <button type="submit" class="btn btn-uts-primary btn-lg w-100 shadow-sm" onclick="return confirmarAccion(event, '¿Está seguro de emitir este concepto y calificación?');">
-                            <i class="bi bi-save me-1"></i> Asentar Calificación
+                        <button type="submit" class="btn btn-uts-primary btn-lg w-100 shadow-sm" onclick="return confirmarAccion(event, '¿Confirma el registro de su revisión y decisión?');">
+                            <i class="bi bi-send-check-fill me-1"></i> Guardar Revisión y Procesar Envío
                         </button>
                     </form>
                 </div>

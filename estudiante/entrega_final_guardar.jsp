@@ -13,16 +13,16 @@
 <c:set var="resumenFinal" value="${fn:trim(param.resumen_documento_final)}" />
 
 <c:if test="${empty idAnteproyecto or empty enlaceFinal or empty resumenFinal}">
-    <c:set var="mensaje_error" value="Todos los campos son obligatorios para radicar la entrega final." scope="session" />
+    <c:set var="mensaje_error" value="Todos los campos son obligatorios para enviar el informe del proyecto al Director." scope="session" />
     <c:redirect url="/estudiante/entrega_final.jsp" />
 </c:if>
 
 <c:if test="${!fn:startsWith(enlaceFinal, 'http://') and !fn:startsWith(enlaceFinal, 'https://')}">
-    <c:set var="mensaje_error" value="El enlace al documento final debe ser una URL válida (http:// o https://)." scope="session" />
+    <c:set var="mensaje_error" value="El enlace al informe del proyecto debe ser una URL válida (http:// o https://)." scope="session" />
     <c:redirect url="/estudiante/entrega_final.jsp" />
 </c:if>
 
-<%-- Actualizar anteproyecto a estado 'Documento final entregado' --%>
+<%-- Actualizar anteproyecto a estado 'Documento final entregado' (desbloquea Fase 5 para el Director) --%>
 <sql:update dataSource="${conn}">
     UPDATE anteproyectos 
     SET enlace_documento_final = ?, 
@@ -39,11 +39,11 @@
 <%-- Registrar en historial de estados --%>
 <sql:update dataSource="${conn}">
     INSERT INTO historial_estados (id_anteproyecto, id_usuario, estado_anterior, estado_nuevo, observacion)
-    VALUES (?, ?, ?, 'Documento final entregado', 'El estudiante ha radicado el enlace al documento final de grado y monografía')
+    VALUES (?, ?, ?, 'Documento final entregado', 'Fase 4 completada: El estudiante subió el Informe del Proyecto y lo envió al Director.')
     <sql:param value="${idAnteproyecto}" />
     <sql:param value="${sessionScope.id_usuario}" />
     <sql:param value="${estadoAnterior}" />
 </sql:update>
 
-<c:set var="mensaje_exito" value="¡Entrega final radicada exitosamente! Tus docentes tutores y jurados evaluadores revisarán el informe final." scope="session" />
-<c:redirect url="/estudiante/anteproyecto_ver.jsp" />
+<c:set var="mensaje_exito" value="¡Fase 4 completada! Informe del proyecto enviado al Director. Se ha desbloqueado la Fase 5 (Revisión del Informe por el Director y envío al Comité Evaluador)." scope="session" />
+<c:redirect url="/estudiante/index.jsp" />

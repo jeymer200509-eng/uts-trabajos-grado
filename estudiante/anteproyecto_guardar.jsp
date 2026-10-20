@@ -7,9 +7,9 @@
 <%@ include file="/includes/conexion.jspf" %>
 <%@ include file="/includes/seguridad.jspf" %>
 
-<c:set var="esEdicion" value="${param.es_edicion == '1'}" />
 <c:set var="idAnteproyecto" value="${param.id_anteproyecto}" />
 <c:set var="estadoAnterior" value="${param.estado_anterior}" />
+<c:set var="idDirector" value="${empty param.id_director ? null : fn:trim(param.id_director)}" />
 
 <c:set var="titulo" value="${fn:trim(param.titulo)}" />
 <c:set var="linea" value="${fn:trim(param.linea_investigacion)}" />
@@ -21,108 +21,66 @@
 <c:set var="resumen" value="${fn:trim(param.resumen)}" />
 <c:set var="enlace" value="${fn:trim(param.enlace_documento)}" />
 
+<%-- Validar que haya completado Fase 1 (Desprendible de Pago) --%>
+<sql:query var="qProyEst" dataSource="${conn}">
+    SELECT id_anteproyecto, estado, enlace_desprendible, id_director FROM anteproyectos WHERE id_estudiante = ?
+    <sql:param value="${sessionScope.id_usuario}" />
+</sql:query>
+
+<c:if test="${qProyEst.rowCount == 0 or empty qProyEst.rows[0].enlace_desprendible}">
+    <c:set var="mensaje_error" value="Fase bloqueada: Primero debes subir el desprendible de pago (Fase 1)." scope="session" />
+    <c:redirect url="/estudiante/index.jsp" />
+</c:if>
+
+<c:set var="idAnteproyecto" value="${qProyEst.rows[0].id_anteproyecto}" />
+<c:set var="estadoAnterior" value="${qProyEst.rows[0].estado}" />
+<c:if test="${empty idDirector and not empty qProyEst.rows[0].id_director}">
+    <c:set var="idDirector" value="${qProyEst.rows[0].id_director}" />
+</c:if>
+
 <%-- Validaciones en Servidor con JSTL --%>
-<c:if test="${empty titulo or empty linea or empty version or empty problema or empty objGeneral or empty objEspecificos or empty resumen or empty enlace}">
-    <c:set var="mensaje_error" value="Todos los campos obligatorios (*) deben ser diligenciados." scope="session" />
+<c:if test="${empty titulo or empty linea or empty version or empty problema or empty objGeneral or empty objEspecificos or empty resumen or empty enlace or empty idDirector}">
+    <c:set var="mensaje_error" value="Todos los campos obligatorios (*), incluyendo el Director y el enlace al documento de la propuesta, deben ser diligenciados." scope="session" />
     <c:redirect url="/estudiante/anteproyecto_formulario.jsp" />
 </c:if>
 
 <c:if test="${!fn:startsWith(enlace, 'http://') and !fn:startsWith(enlace, 'https://')}">
-    <c:set var="mensaje_error" value="El enlace al documento debe ser una URL válida que inicie con http:// o https://" scope="session" />
+    <c:set var="mensaje_error" value="El enlace al documento de la propuesta debe ser una URL válida que inicie con http:// o https://" scope="session" />
     <c:redirect url="/estudiante/anteproyecto_formulario.jsp" />
 </c:if>
 
-<c:choose>
-    <c:when test="${esEdicion}">
-        <%-- Determinar nuevo estado tras la edición --%>
-        <c:set var="nuevoEstado" value="${estadoAnterior}" />
-        <c:choose>
-            <c:when test="${estadoAnterior == 'Idea seleccionada'}">
-                <c:set var="nuevoEstado" value="Anteproyecto radicado" />
-            </c:when>
-            <c:when test="${estadoAnterior == 'Devuelto con observaciones'}">
-                <c:set var="nuevoEstado" value="En revisión por director" />
-            </c:when>
-        </c:choose>
+<%-- Al enviar la propuesta al Director, pasa a 'En revisión por director' (desbloquea Fase 3) --%>
+<c:set var="nuevoEstado" value="En revisión por director" />
 
-        <sql:update dataSource="${conn}">
-            UPDATE anteproyectos 
-            SET titulo = ?, linea_investigacion = ?, planteamiento_problema = ?, justificacion = ?,
-                objetivo_general = ?, objetivos_especificos = ?, resumen = ?, enlace_documento = ?, 
-                version = ?, estado = ?
-            WHERE id_anteproyecto = ? AND id_estudiante = ?
-            <sql:param value="${titulo}" />
-            <sql:param value="${linea}" />
-            <sql:param value="${problema}" />
-            <sql:param value="${justificacion}" />
-            <sql:param value="${objGeneral}" />
-            <sql:param value="${objEspecificos}" />
-            <sql:param value="${resumen}" />
-            <sql:param value="${enlace}" />
-            <sql:param value="${version}" />
-            <sql:param value="${nuevoEstado}" />
-            <sql:param value="${idAnteproyecto}" />
-            <sql:param value="${sessionScope.id_usuario}" />
-        </sql:update>
+<sql:update dataSource="${conn}">
+    UPDATE anteproyectos 
+    SET id_director = ?, titulo = ?, linea_investigacion = ?, planteamiento_problema = ?, justificacion = ?,
+        objetivo_general = ?, objetivos_especificos = ?, resumen = ?, enlace_documento = ?, 
+        version = ?, estado = ?
+    WHERE id_anteproyecto = ? AND id_estudiante = ?
+    <sql:param value="${idDirector}" />
+    <sql:param value="${titulo}" />
+    <sql:param value="${linea}" />
+    <sql:param value="${problema}" />
+    <sql:param value="${justificacion}" />
+    <sql:param value="${objGeneral}" />
+    <sql:param value="${objEspecificos}" />
+    <sql:param value="${resumen}" />
+    <sql:param value="${enlace}" />
+    <sql:param value="${version}" />
+    <sql:param value="${nuevoEstado}" />
+    <sql:param value="${idAnteproyecto}" />
+    <sql:param value="${sessionScope.id_usuario}" />
+</sql:update>
 
-        <%-- Registrar en historial de estados si hubo transición --%>
-        <c:if test="${nuevoEstado != estadoAnterior}">
-            <sql:update dataSource="${conn}">
-                INSERT INTO historial_estados (id_anteproyecto, id_usuario, estado_anterior, estado_nuevo, observacion)
-                VALUES (?, ?, ?, ?, 'Actualización de propuesta y radicación de ajustes por estudiante')
-                <sql:param value="${idAnteproyecto}" />
-                <sql:param value="${sessionScope.id_usuario}" />
-                <sql:param value="${estadoAnterior}" />
-                <sql:param value="${nuevoEstado}" />
-            </sql:update>
-        </c:if>
+<sql:update dataSource="${conn}">
+    INSERT INTO historial_estados (id_anteproyecto, id_usuario, estado_anterior, estado_nuevo, observacion)
+    VALUES (?, ?, ?, ?, 'Fase 2 completada: El estudiante envió la propuesta y su documento en nube al Director para revisión.')
+    <sql:param value="${idAnteproyecto}" />
+    <sql:param value="${sessionScope.id_usuario}" />
+    <sql:param value="${estadoAnterior}" />
+    <sql:param value="${nuevoEstado}" />
+</sql:update>
 
-        <c:set var="mensaje_exito" value="Propuesta de anteproyecto actualizada y radicada con éxito." scope="session" />
-    </c:when>
-
-    <c:otherwise>
-        <%-- Verificar unicidad de proyecto por estudiante --%>
-        <sql:query var="qCheckUnico" dataSource="${conn}">
-            SELECT id_anteproyecto FROM anteproyectos WHERE id_estudiante = ?
-            <sql:param value="${sessionScope.id_usuario}" />
-        </sql:query>
-
-        <c:if test="${qCheckUnico.rowCount > 0}">
-            <c:set var="mensaje_error" value="Ya posee un proyecto activo en el sistema. No puede registrar más de uno a la vez." scope="session" />
-            <c:redirect url="/estudiante/anteproyecto_ver.jsp" />
-        </c:if>
-
-        <sql:update dataSource="${conn}">
-            INSERT INTO anteproyectos 
-            (id_estudiante, titulo, linea_investigacion, planteamiento_problema, justificacion,
-             objetivo_general, objetivos_especificos, resumen, enlace_documento, version, estado)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Anteproyecto radicado')
-            <sql:param value="${sessionScope.id_usuario}" />
-            <sql:param value="${titulo}" />
-            <sql:param value="${linea}" />
-            <sql:param value="${problema}" />
-            <sql:param value="${justificacion}" />
-            <sql:param value="${objGeneral}" />
-            <sql:param value="${objEspecificos}" />
-            <sql:param value="${resumen}" />
-            <sql:param value="${enlace}" />
-            <sql:param value="${version}" />
-        </sql:update>
-
-        <sql:query var="qNuevo" dataSource="${conn}">
-            SELECT id_anteproyecto FROM anteproyectos WHERE id_estudiante = ?
-            <sql:param value="${sessionScope.id_usuario}" />
-        </sql:query>
-
-        <sql:update dataSource="${conn}">
-            INSERT INTO historial_estados (id_anteproyecto, id_usuario, estado_anterior, estado_nuevo, observacion)
-            VALUES (?, ?, NULL, 'Anteproyecto radicado', 'Radicación formal libre de anteproyecto de grado')
-            <sql:param value="${qNuevo.rows[0].id_anteproyecto}" />
-            <sql:param value="${sessionScope.id_usuario}" />
-        </sql:update>
-
-        <c:set var="mensaje_exito" value="¡Tu anteproyecto ha sido radicado exitosamente! Coordinación procederá con la asignación tutorial." scope="session" />
-    </c:otherwise>
-</c:choose>
-
-<c:redirect url="/estudiante/anteproyecto_ver.jsp" />
+<c:set var="mensaje_exito" value="¡Fase 2 completada! Tu propuesta ha sido enviada al Director. Se ha desbloqueado la Fase 3 (Revisión del Director y envío al Comité Evaluador)." scope="session" />
+<c:redirect url="/estudiante/index.jsp" />

@@ -51,7 +51,12 @@
                 </div>
 
                 <div class="card-body p-4">
-                    <form action="${pageContext.request.contextPath}/admin/usuarios_guardar.jsp" method="POST" id="formUsuario">
+                    <div id="alertaValidacionCliente" class="alert alert-danger d-none align-items-center shadow-sm mb-4" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill fs-5 me-2"></i>
+                        <div id="textoAlertaCliente"></div>
+                    </div>
+
+                    <form action="${pageContext.request.contextPath}/admin/usuarios_guardar.jsp" method="POST" id="formUsuario" onsubmit="return validarFormularioUsuario(event)">
                         <input type="hidden" name="es_edicion" value="${esEdicion ? '1' : '0'}">
                         <c:if test="${esEdicion}">
                             <input type="hidden" name="id_usuario" value="${u.id_usuario}">
@@ -133,12 +138,16 @@
                         <div class="row g-3 mb-3">
                             <div class="col-md-6">
                                 <label for="correo" class="form-label fw-semibold">
-                                    <span class="text-danger">*</span> Correo Institucional:
+                                    <span class="text-danger">*</span> Correo Institucional (@uts.edu.co):
                                 </label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-envelope"></i></span>
                                     <input type="email" class="form-control" id="correo" name="correo" 
-                                           value="<c:out value='${esEdicion ? u.correo : \"\"}' />" required placeholder="usuario@uts.edu.co">
+                                           value="<c:out value='${esEdicion ? u.correo : \"\"}' />" required 
+                                           placeholder="usuario@uts.edu.co" oninput="validarCorreoInstitucional()">
+                                </div>
+                                <div id="feedbackCorreo" class="form-text">
+                                    Debe ser obligatoriamente correo institucional terminado en <strong>@uts.edu.co</strong>.
                                 </div>
                             </div>
 
@@ -154,25 +163,34 @@
                             </div>
                         </div>
 
-                        <!-- Campos condicionales de Estudiante: Semestre -->
+                        <!-- Campos condicionales de Estudiante: Semestre y % de Créditos -->
                         <div class="row g-3 mb-3" id="campoSemestre">
                             <div class="col-md-6">
                                 <label for="semestre" class="form-label fw-semibold">
-                                    Semestre Académico (1 al 10):
+                                    <span class="text-danger">*</span> Semestre Académico (1 al 10):
                                 </label>
                                 <input type="number" class="form-control" id="semestre" name="semestre" min="1" max="10" 
                                        value="<c:out value='${esEdicion ? u.semestre : \"\"}' />" placeholder="ej. 6">
                             </div>
-                            <div class="col-md-6 d-flex align-items-center pt-md-4">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="activo" name="activo" value="1" 
-                                           ${(not esEdicion or u.activo) ? 'checked' : ''}>
-                                    <label class="form-check-label fw-semibold" for="activo">Usuario Habilitado / Activo</label>
+                            <div class="col-md-6">
+                                <label for="porcentaje_creditos" class="form-label fw-semibold">
+                                    <span class="text-danger">*</span> % de Créditos Completados:
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-mortarboard-fill"></i></span>
+                                    <input type="number" class="form-control" id="porcentaje_creditos" name="porcentaje_creditos" 
+                                           min="0" max="100" step="0.1"
+                                           value="<c:out value='${esEdicion ? \"75\" : \"\"}' />" 
+                                           placeholder="Ej. 75 (Mínimo 75%)" oninput="validarCreditosEstudiante()">
+                                    <span class="input-group-text fw-bold">%</span>
+                                </div>
+                                <div id="feedbackCreditos" class="form-text">
+                                    Requisito: mínimo <strong>75%</strong> de créditos completados para poder registrarse.
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Clave -->
+                        <!-- Clave y Estado Activo -->
                         <div class="row g-3 mb-4">
                             <div class="col-md-6">
                                 <label for="clave" class="form-label fw-semibold">
@@ -191,6 +209,13 @@
                                            ${esEdicion ? '' : 'required'} minlength="6" placeholder="Mínimo 6 caracteres">
                                 </div>
                                 <div class="form-text">Se encriptará con SHA-256 en la base de datos.</div>
+                            </div>
+                            <div class="col-md-6 d-flex align-items-center pt-md-4">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="activo" name="activo" value="1" 
+                                           ${(not esEdicion or u.activo) ? 'checked' : ''}>
+                                    <label class="form-check-label fw-semibold" for="activo">Usuario Habilitado / Activo</label>
+                                </div>
                             </div>
                         </div>
 
@@ -211,30 +236,140 @@
 </div>
 
 <script>
-function adaptarFormularioPorRol() {
+function obtenerRolSeleccionado() {
     const selRol = document.getElementById('id_rol');
     const selectedOption = selRol.options[selRol.selectedIndex];
-    const nombreRol = selectedOption ? selectedOption.getAttribute('data-nombre') : '';
+    return selectedOption ? selectedOption.getAttribute('data-nombre') : '';
+}
+
+function adaptarFormularioPorRol() {
+    const nombreRol = obtenerRolSeleccionado();
     const labelCodigo = document.getElementById('labelCodigo');
     const campoSemestre = document.getElementById('campoSemestre');
     const inputSemestre = document.getElementById('semestre');
+    const inputCreditos = document.getElementById('porcentaje_creditos');
 
     if (nombreRol === 'ESTUDIANTE') {
         labelCodigo.innerHTML = '<span class="text-danger">*</span> Código Estudiantil:';
         campoSemestre.style.display = 'flex';
         inputSemestre.required = true;
+        inputCreditos.required = true;
     } else if (nombreRol === 'DIRECTOR' || nombreRol === 'EVALUADOR') {
         labelCodigo.innerHTML = '<span class="text-danger">*</span> Código Docente:';
         campoSemestre.style.display = 'none';
         inputSemestre.required = false;
         inputSemestre.value = '';
+        inputCreditos.required = false;
+        inputCreditos.value = '';
+        inputCreditos.classList.remove('is-invalid', 'is-valid');
     } else {
         labelCodigo.innerHTML = '<span class="text-danger">*</span> Código Funcionario:';
         campoSemestre.style.display = 'none';
         inputSemestre.required = false;
         inputSemestre.value = '';
+        inputCreditos.required = false;
+        inputCreditos.value = '';
+        inputCreditos.classList.remove('is-invalid', 'is-valid');
     }
 }
+
+function validarCorreoInstitucional() {
+    const inputCorreo = document.getElementById('correo');
+    const feedback = document.getElementById('feedbackCorreo');
+    const valor = inputCorreo.value.trim().toLowerCase();
+
+    if (valor === '') {
+        inputCorreo.classList.remove('is-invalid', 'is-valid');
+        feedback.className = 'form-text';
+        feedback.innerHTML = 'Debe ser obligatoriamente correo institucional terminado en <strong>@uts.edu.co</strong>.';
+        return false;
+    }
+
+    const regexUts = /^[a-z0-9._%+-]+@uts\.edu\.co$/;
+    if (!regexUts.test(valor)) {
+        inputCorreo.classList.add('is-invalid');
+        inputCorreo.classList.remove('is-valid');
+        feedback.className = 'form-text text-danger fw-semibold';
+        feedback.innerHTML = '<i class="bi bi-x-circle-fill me-1"></i>Correo inválido: debe pertenecer al dominio institucional <strong>@uts.edu.co</strong>.';
+        return false;
+    } else {
+        inputCorreo.classList.remove('is-invalid');
+        inputCorreo.classList.add('is-valid');
+        feedback.className = 'form-text text-success fw-semibold';
+        feedback.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i>Correo institucional @uts.edu.co válido.';
+        return true;
+    }
+}
+
+function validarCreditosEstudiante() {
+    const inputCreditos = document.getElementById('porcentaje_creditos');
+    const feedback = document.getElementById('feedbackCreditos');
+    const valorStr = inputCreditos.value.trim();
+
+    if (valorStr === '') {
+        inputCreditos.classList.remove('is-invalid', 'is-valid');
+        feedback.className = 'form-text';
+        feedback.innerHTML = 'Requisito: mínimo <strong>75%</strong> de créditos completados para poder registrarse.';
+        return false;
+    }
+
+    const porcentaje = parseFloat(valorStr);
+    if (isNaN(porcentaje) || porcentaje < 0 || porcentaje > 100) {
+        inputCreditos.classList.add('is-invalid');
+        inputCreditos.classList.remove('is-valid');
+        feedback.className = 'form-text text-danger fw-semibold';
+        feedback.innerHTML = '<i class="bi bi-x-circle-fill me-1"></i>Ingrese un porcentaje válido entre 0% y 100%.';
+        return false;
+    } else if (porcentaje < 75) {
+        inputCreditos.classList.add('is-invalid');
+        inputCreditos.classList.remove('is-valid');
+        feedback.className = 'form-text text-danger fw-semibold';
+        feedback.innerHTML = '<i class="bi bi-x-circle-fill me-1"></i>No permitido: tiene menos del 75% de créditos completados (' + porcentaje + '%). No se puede crear el estudiante.';
+        return false;
+    } else {
+        inputCreditos.classList.remove('is-invalid');
+        inputCreditos.classList.add('is-valid');
+        feedback.className = 'form-text text-success fw-semibold';
+        feedback.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i>Cumple con el requisito mínimo del 75% de créditos completados (' + porcentaje + '%).';
+        return true;
+    }
+}
+
+function mostrarAlertaCliente(mensaje) {
+    const alerta = document.getElementById('alertaValidacionCliente');
+    const texto = document.getElementById('textoAlertaCliente');
+    texto.innerHTML = mensaje;
+    alerta.classList.remove('d-none');
+    alerta.classList.add('d-flex');
+    alerta.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function validarFormularioUsuario(event) {
+    const nombreRol = obtenerRolSeleccionado();
+    const correoValido = validarCorreoInstitucional();
+
+    if (!correoValido) {
+        event.preventDefault();
+        mostrarAlertaCliente('<strong>Error de validación:</strong> El correo debe ser institucional y terminar en <strong>@uts.edu.co</strong>.');
+        document.getElementById('correo').focus();
+        return false;
+    }
+
+    if (nombreRol === 'ESTUDIANTE') {
+        const inputCreditos = document.getElementById('porcentaje_creditos');
+        const porcentaje = parseFloat(inputCreditos.value);
+        if (isNaN(porcentaje) || porcentaje < 75 || porcentaje > 100) {
+            event.preventDefault();
+            validarCreditosEstudiante();
+            mostrarAlertaCliente('<strong>Registro no permitido:</strong> Para registrar un estudiante debe tener el <strong>75% o más</strong> de créditos completados.');
+            inputCreditos.focus();
+            return false;
+        }
+    }
+
+    return true;
+}
+
 document.addEventListener('DOMContentLoaded', adaptarFormularioPorRol);
 </script>
 

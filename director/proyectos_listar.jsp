@@ -92,13 +92,20 @@
                                             </c:if>
                                         </td>
                                         <td>
-                                            <a href="<c:out value='${p.enlace_documento}' />" target="_blank" class="btn btn-sm btn-outline-primary mb-1 d-inline-block">
-                                                <i class="bi bi-file-earmark-pdf me-1"></i> Anteproyecto
-                                            </a>
+                                            <c:if test="${not empty p.enlace_desprendible}">
+                                                <a href="<c:out value='${p.enlace_desprendible}' />" target="_blank" class="btn btn-sm btn-outline-secondary mb-1 d-inline-block" title="Desprendible de Pago">
+                                                    <i class="bi bi-receipt me-1"></i> Pago
+                                                </a>
+                                            </c:if>
+                                            <c:if test="${not empty p.enlace_documento and p.enlace_documento != 'PENDIENTE'}">
+                                                <a href="<c:out value='${p.enlace_documento}' />" target="_blank" class="btn btn-sm btn-outline-primary mb-1 d-inline-block">
+                                                    <i class="bi bi-file-earmark-pdf me-1"></i> Propuesta
+                                                </a>
+                                            </c:if>
                                             <c:if test="${not empty p.enlace_documento_final}">
                                                 <br>
                                                 <a href="<c:out value='${p.enlace_documento_final}' />" target="_blank" class="btn btn-sm btn-success d-inline-block">
-                                                    <i class="bi bi-file-earmark-check me-1"></i> Doc. Final
+                                                    <i class="bi bi-file-earmark-check me-1"></i> Informe Final
                                                 </a>
                                             </c:if>
                                         </td>
