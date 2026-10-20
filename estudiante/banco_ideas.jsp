@@ -12,14 +12,16 @@
 <%@ include file="/includes/header.jspf" %>
 <%@ include file="/includes/navbar.jspf" %>
 
-<%-- Verificar estado del proyecto y si el desprendible de pago (Fase 1) ya fue aceptado por Coordinación --%>
+<%-- Verificar si el estudiante ya seleccionó una idea --%>
 <sql:query var="qCheckEst" dataSource="${conn}">
-    SELECT id_anteproyecto, titulo, estado, enlace_desprendible, estado_pago, enlace_documento FROM anteproyectos WHERE id_estudiante = ?
+    SELECT id_anteproyecto, id_idea, titulo, linea_investigacion, estado, enlace_desprendible, estado_pago, observacion_pago, enlace_documento
+    FROM anteproyectos WHERE id_estudiante = ?
     <sql:param value="${sessionScope.id_usuario}" />
 </sql:query>
-<c:set var="tieneRegistro" value="${qCheckEst.rowCount > 0}" />
-<c:set var="fase1Completa" value="${tieneRegistro and not empty qCheckEst.rows[0].enlace_desprendible and qCheckEst.rows[0].estado_pago == 'Aprobado'}" />
-<c:set var="yaEnvioPropuesta" value="${tieneRegistro and qCheckEst.rows[0].estado != 'Idea seleccionada' and qCheckEst.rows[0].enlace_documento != 'PENDIENTE'}" />
+<c:set var="tieneIdeaSeleccionada" value="${qCheckEst.rowCount > 0}" />
+<c:if test="${tieneIdeaSeleccionada}">
+    <c:set var="miProy" value="${qCheckEst.rows[0]}" />
+</c:if>
 
 <%-- Consultar ideas disponibles --%>
 <sql:query var="qIdeasDisp" dataSource="${conn}">
@@ -32,34 +34,83 @@
 </sql:query>
 
 <div class="container px-lg-4 py-4">
-    <div class="mb-4">
-        <h2 class="fw-bold mb-1 text-dark">
-            <i class="bi bi-lightbulb-fill text-warning me-2"></i>Banco de Ideas para Grado
-        </h2>
-        <p class="text-secondary mb-0">Explore las propuestas y líneas de investigación publicadas por los comités y grupos de investigación de las UTS.</p>
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+        <div>
+            <h2 class="fw-bold mb-1 text-dark">
+                <i class="bi bi-lightbulb-fill text-warning me-2"></i>Banco de Ideas para Grado
+            </h2>
+            <p class="text-secondary mb-0">Paso 1: Selecciona una idea del banco institucional para habilitar la carga de tu desprendible de pago y continuar las fases de tu proyecto.</p>
+        </div>
+        <a href="${pageContext.request.contextPath}/estudiante/index.jsp" class="btn btn-outline-secondary">
+            <i class="bi bi-diagram-3 me-1"></i> Ir a Mi Panel de Fases
+        </a>
     </div>
 
-    <c:if test="${!fase1Completa}">
-        <div class="alert alert-danger shadow-sm d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
-            <div class="d-flex align-items-center">
-                <i class="bi bi-lock-fill fs-3 me-3 text-danger"></i>
+    <%-- Si ya seleccionó una idea, mostrar tarjeta de su idea con la opción habilitada de subir el Desprendible de Pago --%>
+    <c:if test="${tieneIdeaSeleccionada}">
+        <div class="card card-uts shadow-sm mb-4 border-start border-4 border-start-success">
+            <div class="card-header bg-white py-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
                 <div>
-                    <strong>Fase Bloqueada (Falta Desprendible de Pago):</strong> Para seleccionar una idea y enviar la propuesta al Director, primero debes subir el enlace de tu <strong>Desprendible de Pago (Fase 1)</strong>.
+                    <span class="badge bg-success me-2"><i class="bi bi-check2-circle me-1"></i>Idea Seleccionada</span>
+                    <strong class="text-dark"><c:out value="${miProy.titulo}" /></strong>
                 </div>
+                <span class="badge bg-light text-secondary border">Estado Proyecto: <c:out value="${miProy.estado}" /></span>
             </div>
-            <a href="${pageContext.request.contextPath}/estudiante/index.jsp" class="btn btn-danger btn-sm fw-semibold">
-                <i class="bi bi-upload me-1"></i> Ir a Fase 1 (Subir Desprendible)
-            </a>
-        </div>
-    </c:if>
+            <div class="card-body p-4">
+                <h6 class="fw-bold text-dark mb-2">
+                    <i class="bi bi-receipt-cutoff text-primary me-1"></i>Fase 1 Habilitada: Subir Desprendible de Pago (Link PDF Drive / Nube)
+                </h6>
+                <p class="small text-secondary mb-3">
+                    Ya tienes tu idea seleccionada. Sube aquí el enlace a tu desprendible de pago en PDF para que <strong>Coordinación</strong> lo revise y acepte, desbloqueando el envío de la propuesta al Director.
+                </p>
 
-    <c:if test="${yaEnvioPropuesta}">
-        <div class="alert alert-warning shadow-sm d-flex align-items-center mb-4">
-            <i class="bi bi-exclamation-triangle-fill fs-3 me-3 text-warning"></i>
-            <div>
-                <strong>Aviso de Restricción UTS:</strong> Ya tienes una propuesta de grado enviada en el sistema: 
-                "<strong><c:out value="${qCheckEst.rows[0].titulo}" /></strong>" (Estado: <c:out value="${qCheckEst.rows[0].estado}" />).
-                <div class="small">La normativa institucional solo permite tener un proyecto activo simultáneamente.</div>
+                <c:if test="${not empty miProy.enlace_desprendible and miProy.estado_pago == 'En revisión'}">
+                    <div class="alert alert-warning py-2 small mb-3">
+                        <i class="bi bi-hourglass-split me-1"></i>
+                        <strong>En revisión por Coordinación:</strong> Tu desprendible ya fue subido y está pendiente de aceptación por el Coordinador.
+                    </div>
+                </c:if>
+
+                <c:if test="${not empty miProy.enlace_desprendible and miProy.estado_pago == 'Rechazado'}">
+                    <div class="alert alert-danger py-2 small mb-3">
+                        <i class="bi bi-x-circle-fill me-1"></i>
+                        <strong>Rechazado por Coordinación:</strong> <c:out value="${miProy.observacion_pago}" />. Por favor sube un nuevo enlace válido.
+                    </div>
+                </c:if>
+
+                <c:if test="${not empty miProy.enlace_desprendible and miProy.estado_pago == 'Aprobado'}">
+                    <div class="alert alert-success py-2 small d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+                        <div>
+                            <i class="bi bi-check-circle-fill me-1"></i>
+                            <strong>¡Desprendible Aceptado por Coordinación!</strong> Ya tienes desbloqueadas las siguientes fases en tu panel.
+                        </div>
+                        <a href="${pageContext.request.contextPath}/estudiante/index.jsp" class="btn btn-sm btn-success fw-semibold">
+                            Continuar a Fase 2 (Enviar Propuesta al Director) &rarr;
+                        </a>
+                    </div>
+                </c:if>
+
+                <form action="${pageContext.request.contextPath}/estudiante/desprendible_guardar.jsp" method="POST" class="row g-2 align-items-center">
+                    <div class="col-md-8">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-file-earmark-pdf-fill text-danger"></i></span>
+                            <input type="url" name="enlace_desprendible" class="form-control" required
+                                   value="<c:out value='${miProy.enlace_desprendible}' />"
+                                   placeholder="https://drive.google.com/file/d/... (Enlace al PDF del desprendible de pago)"
+                                   oninput="validarUrlDocumento(this)">
+                        </div>
+                    </div>
+                    <div class="col-md-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-uts-primary flex-grow-1 fw-semibold">
+                            <i class="bi bi-cloud-arrow-up-fill me-1"></i> <c:out value="${not empty miProy.enlace_desprendible ? 'Actualizar Desprendible' : 'Subir Desprendible de Pago'}" />
+                        </button>
+                        <c:if test="${not empty miProy.enlace_desprendible}">
+                            <a href="<c:out value='${miProy.enlace_desprendible}' />" target="_blank" class="btn btn-outline-primary" title="Ver PDF">
+                                <i class="bi bi-box-arrow-up-right"></i>
+                            </a>
+                        </c:if>
+                    </div>
+                </form>
             </div>
         </div>
     </c:if>
@@ -93,13 +144,8 @@
                             <div class="card-footer bg-white border-top-0 d-flex justify-content-between align-items-center py-3">
                                 <span class="small text-muted"><i class="bi bi-people me-1"></i>Cupos: <c:out value="${idea.cupos}" /></span>
                                 <c:choose>
-                                    <c:when test="${!fase1Completa}">
-                                        <button class="btn btn-sm btn-outline-danger" disabled>
-                                            <i class="bi bi-lock-fill me-1"></i> Suba Desprendible (Fase 1)
-                                        </button>
-                                    </c:when>
-                                    <c:when test="${!yaEnvioPropuesta}">
-                                        <form action="${pageContext.request.contextPath}/estudiante/idea_seleccionar.jsp" method="POST" onsubmit="return confirmarAccion(event, '¿Desea postularse y seleccionar esta idea para enviarla al Director?');">
+                                    <c:when test="${!tieneIdeaSeleccionada}">
+                                        <form action="${pageContext.request.contextPath}/estudiante/idea_seleccionar.jsp" method="POST" onsubmit="return confirmarAccion(event, '¿Desea seleccionar esta idea para habilitar la subida de su desprendible de pago?');">
                                             <input type="hidden" name="id_idea" value="${idea.id_idea}">
                                             <button type="submit" class="btn btn-sm btn-uts-primary">
                                                 <i class="bi bi-check2-circle me-1"></i> Seleccionar Esta Idea
@@ -108,7 +154,7 @@
                                     </c:when>
                                     <c:otherwise>
                                         <button class="btn btn-sm btn-outline-secondary" disabled>
-                                            Ya tienes proyecto activo
+                                            Ya seleccionaste una idea
                                         </button>
                                     </c:otherwise>
                                 </c:choose>
@@ -121,15 +167,8 @@
                 <div class="col-12">
                     <div class="card card-uts shadow-sm py-5 text-center text-muted">
                         <i class="bi bi-lightbulb-off fs-1 d-block mb-3 text-secondary opacity-50"></i>
-                        <h5>No hay ideas disponibles en este momento</h5>
-                        <p class="text-muted small">Puedes radicar una propuesta libre de anteproyecto o esperar una nueva convocatoria de la Coordinación.</p>
-                        <c:if test="${!yaTieneProyecto}">
-                            <div>
-                                <a href="${pageContext.request.contextPath}/estudiante/anteproyecto_formulario.jsp" class="btn btn-uts-primary">
-                                    <i class="bi bi-pencil-square me-1"></i> Radicar Propuesta Libre
-                                </a>
-                            </div>
-                        </c:if>
+                        <h5>No hay más ideas disponibles en este momento</h5>
+                        <p class="text-muted small">Consulta el estado de tu proyecto en tu Panel de Fases.</p>
                     </div>
                 </div>
             </c:otherwise>
