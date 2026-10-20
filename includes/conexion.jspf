@@ -1,0 +1,51 @@
+<%-- 
+    =====================================================================
+    CONEXIÓN ÚNICA A LA BASE DE DATOS - JSTL SQL
+    UTS - Sistema de Trabajos de Grado
+    Compatible con Local (XAMPP) y Nube (Railway, Render, Clever Cloud, Docker)
+    =====================================================================
+--%>
+<%@ page pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="sql" uri="http://java.sun.com/jsp/jstl/sql" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+
+<fmt:requestEncoding value="UTF-8" />
+
+<%-- Obtener parámetros desde web.xml (context-param) o variables de entorno --%>
+<c:set var="envHost" value="${initParam.DB_HOST}" />
+<c:set var="envPort" value="${initParam.DB_PORT}" />
+<c:set var="envName" value="${initParam.DB_NAME}" />
+<c:set var="envUser" value="${initParam.DB_USER}" />
+<c:set var="envPass" value="${initParam.DB_PASS}" />
+<c:set var="envUrl"  value="${initParam.DB_URL}" />
+<c:set var="envSsl"  value="${initParam.DB_SSL}" />
+
+<%-- Valores con fallback automático a XAMPP local si no están configurados --%>
+<c:set var="hostVal" value="${(not empty envHost and not fn:startsWith(envHost, '$')) ? envHost : 'localhost'}" />
+<c:set var="portVal" value="${(not empty envPort and not fn:startsWith(envPort, '$')) ? envPort : '3306'}" />
+<c:set var="nameVal" value="${(not empty envName and not fn:startsWith(envName, '$')) ? envName : 'uts_trabajos_grado'}" />
+<c:set var="userVal" value="${(not empty envUser and not fn:startsWith(envUser, '$')) ? envUser : 'root'}" />
+<c:set var="passVal" value="${(not empty envPass and not fn:startsWith(envPass, '$')) ? envPass : ''}" />
+<c:set var="sslVal"  value="${(not empty envSsl and not fn:startsWith(envSsl, '$')) ? envSsl : 'false'}" />
+
+<c:choose>
+    <c:when test="${not empty envUrl and not fn:startsWith(envUrl, '$')}">
+        <c:set var="finalDbUrl" value="${envUrl}" />
+    </c:when>
+    <c:otherwise>
+        <c:set var="finalDbUrl" value="jdbc:mysql://${hostVal}:${portVal}/${nameVal}?useSSL=${sslVal}&allowPublicKeyRetrieval=true&serverTimezone=America/Bogota&characterEncoding=UTF-8" />
+    </c:otherwise>
+</c:choose>
+
+<%-- Configurar DataSource en el scope application --%>
+<sql:setDataSource 
+    var="conn"
+    driver="com.mysql.cj.jdbc.Driver"
+    url="${finalDbUrl}"
+    user="${userVal}"
+    password="${passVal}"
+    scope="application" />
+
+

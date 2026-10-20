@@ -1,0 +1,24 @@
+<%-- 
+    =====================================================================
+    CONTROL DE ACCESO Y SEGURIDAD POR ROLES - JSTL
+    UTS - Sistema de Trabajos de Grado
+    Valida la existencia de la sesión y los permisos del rol actual.
+    =====================================================================
+--%>
+<%@ page pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+
+<%-- 1. Validación de sesión activa --%>
+<c:if test="${empty sessionScope.usuario}">
+    <c:set var="mensaje_error" value="Su sesión ha expirado o no ha iniciado sesión. Por favor ingrese sus credenciales." scope="session" />
+    <c:redirect url="/login.jsp" />
+</c:if>
+
+<%-- 2. Validación de rol requerido (si la página especificó rolRequerido) --%>
+<c:if test="${not empty rolRequerido}">
+    <c:if test="${!fn:contains(rolRequerido, sessionScope.rol)}">
+        <c:set var="mensaje_error" value="No tiene permisos para acceder a esta sección (${sessionScope.rol})." scope="session" />
+        <c:redirect url="/index.jsp" />
+    </c:if>
+</c:if>

@@ -1,0 +1,242 @@
+<%-- 
+    =====================================================================
+    BARRA DE NAVEGACIÓN Y MENSAJES FLASH - JSTL
+    UTS - Sistema de Trabajos de Grado
+    =====================================================================
+--%>
+<%@ page pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+
+<nav class="navbar navbar-expand-lg navbar-dark navbar-uts sticky-top" style="background: #006633 !important; background: linear-gradient(135deg, #006633 0%, #004d26 100%) !important;">
+    <div class="container-fluid px-lg-4">
+        <a class="navbar-brand d-flex align-items-center gap-2" href="${pageContext.request.contextPath}/index.jsp">
+            <span class="badge rounded-pill p-2 fs-6" style="background: rgba(255, 255, 255, 0.2); color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.35);">
+                <i class="bi bi-mortarboard-fill"></i>
+            </span>
+            <div>
+                <span class="navbar-brand-title d-block lh-1 text-white">UTS Trabajos de Grado</span>
+                <span class="navbar-brand-subtitle text-white-50">Unidades Tecnológicas de Santander</span>
+            </div>
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarUtsMenu" aria-controls="navbarUtsMenu" aria-expanded="false" aria-label="Navegación">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarUtsMenu">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <c:if test="${not empty sessionScope.usuario}">
+                    <%-- Menú para ADMIN --%>
+                    <c:if test="${sessionScope.rol == 'ADMIN'}">
+                        <li class="nav-item">
+                            <a class="nav-link" href="${pageContext.request.contextPath}/admin/index.jsp">
+                                <i class="bi bi-speedometer2"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="${pageContext.request.contextPath}/admin/usuarios_listar.jsp">
+                                <i class="bi bi-people-fill"></i> Gestión de Usuarios
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="${pageContext.request.contextPath}/comun/calendario.jsp">
+                                <i class="bi bi-calendar3"></i> Calendario
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="${pageContext.request.contextPath}/comun/formatos.jsp">
+                                <i class="bi bi-file-earmark-arrow-down"></i> Formatos
+                            </a>
+                        </li>
+                    </c:if>
+
+                    <%-- Menú para COORDINACION --%>
+                    <c:if test="${sessionScope.rol == 'COORDINACION'}">
+                        <li class="nav-item">
+                            <a class="nav-link" href="${pageContext.request.contextPath}/coordinacion/index.jsp">
+                                <i class="bi bi-speedometer2"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="${pageContext.request.contextPath}/coordinacion/ideas_listar.jsp">
+                                <i class="bi bi-lightbulb-fill"></i> Banco de Ideas
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="${pageContext.request.contextPath}/coordinacion/asignacion_listar.jsp">
+                                <i class="bi bi-person-check-fill"></i> Asignar Director/Eval.
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="${pageContext.request.contextPath}/coordinacion/buscador_estudiante.jsp">
+                                <i class="bi bi-search"></i> Buscar Estudiante
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="${pageContext.request.contextPath}/coordinacion/informes.jsp">
+                                <i class="bi bi-bar-chart-fill"></i> Informes
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="${pageContext.request.contextPath}/coordinacion/calendario_gestionar.jsp">
+                                <i class="bi bi-calendar3"></i> Calendario
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="${pageContext.request.contextPath}/coordinacion/formatos_gestionar.jsp">
+                                <i class="bi bi-folder-fill"></i> Formatos
+                            </a>
+                        </li>
+                    </c:if>
+
+                    <%-- Menú para ESTUDIANTE --%>
+                    <c:if test="${sessionScope.rol == 'ESTUDIANTE'}">
+                        <li class="nav-item">
+                            <a class="nav-link" href="${pageContext.request.contextPath}/estudiante/index.jsp">
+                                <i class="bi bi-house-door-fill"></i> Mi Panel
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="${pageContext.request.contextPath}/estudiante/banco_ideas.jsp">
+                                <i class="bi bi-lightbulb"></i> Banco de Ideas
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="${pageContext.request.contextPath}/estudiante/anteproyecto_ver.jsp">
+                                <i class="bi bi-journal-bookmark-fill"></i> Mi Anteproyecto
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="${pageContext.request.contextPath}/estudiante/informe_calificaciones.jsp">
+                                <i class="bi bi-award-fill"></i> Calificaciones
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="${pageContext.request.contextPath}/estudiante/entrega_final.jsp">
+                                <i class="bi bi-file-earmark-check-fill"></i> Entrega Final
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="${pageContext.request.contextPath}/comun/calendario.jsp">
+                                <i class="bi bi-calendar3"></i> Calendario
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="${pageContext.request.contextPath}/comun/formatos.jsp">
+                                <i class="bi bi-file-earmark-arrow-down"></i> Formatos
+                            </a>
+                        </li>
+                    </c:if>
+
+                    <%-- Menú para DIRECTOR --%>
+                    <c:if test="${sessionScope.rol == 'DIRECTOR'}">
+                        <li class="nav-item">
+                            <a class="nav-link" href="${pageContext.request.contextPath}/director/index.jsp">
+                                <i class="bi bi-speedometer2"></i> Mi Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="${pageContext.request.contextPath}/director/proyectos_listar.jsp">
+                                <i class="bi bi-folder-check"></i> Anteproyectos Asignados
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="${pageContext.request.contextPath}/comun/calendario.jsp">
+                                <i class="bi bi-calendar3"></i> Calendario
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="${pageContext.request.contextPath}/comun/formatos.jsp">
+                                <i class="bi bi-file-earmark-arrow-down"></i> Formatos
+                            </a>
+                        </li>
+                    </c:if>
+
+                    <%-- Menú para EVALUADOR --%>
+                    <c:if test="${sessionScope.rol == 'EVALUADOR'}">
+                        <li class="nav-item">
+                            <a class="nav-link" href="${pageContext.request.contextPath}/evaluador/index.jsp">
+                                <i class="bi bi-speedometer2"></i> Mi Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="${pageContext.request.contextPath}/evaluador/proyectos_listar.jsp">
+                                <i class="bi bi-clipboard-check-fill"></i> Proyectos por Calificar
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="${pageContext.request.contextPath}/comun/calendario.jsp">
+                                <i class="bi bi-calendar3"></i> Calendario
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="${pageContext.request.contextPath}/comun/formatos.jsp">
+                                <i class="bi bi-file-earmark-arrow-down"></i> Formatos
+                            </a>
+                        </li>
+                    </c:if>
+                </c:if>
+            </ul>
+
+            <%-- Perfil de Usuario y Cierre de Sesión --%>
+            <ul class="navbar-nav ms-auto align-items-center gap-2">
+                <c:choose>
+                    <c:when test="${not empty sessionScope.usuario}">
+                        <li class="nav-item d-flex align-items-center gap-2">
+                            <div class="text-end d-none d-md-block">
+                                <div class="fw-semibold text-white" style="font-size: 0.88rem;"><c:out value="${sessionScope.nombre_completo}" /></div>
+                                <small class="text-white-50" style="font-size: 0.75rem;"><c:out value="${sessionScope.codigo}" /></small>
+                            </div>
+                            <span class="badge rounded-pill px-3 py-1 shadow-sm" style="background-color: #ffffff !important; color: #006633 !important; font-weight: 700; font-size: 0.72rem; letter-spacing: 0.05em;">
+                                <c:out value="${sessionScope.rol}" />
+                            </span>
+                        </li>
+                        <li class="nav-item ms-2">
+                            <a class="btn btn-sm btn-outline-light rounded-pill px-3" href="${pageContext.request.contextPath}/logout.jsp">
+                                <i class="bi bi-box-arrow-right me-1"></i> Salir
+                            </a>
+                        </li>
+                    </c:when>
+                    <c:otherwise>
+                        <li class="nav-item">
+                            <a class="btn btn-sm btn-outline-light rounded-pill px-4" href="${pageContext.request.contextPath}/login.jsp">
+                                <i class="bi bi-box-arrow-in-right me-1"></i> Iniciar Sesión
+                            </a>
+                        </li>
+                    </c:otherwise>
+                </c:choose>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<%-- Contenedor global de mensajes FLASH --%>
+<div class="container-fluid px-lg-4 mt-3">
+    <c:if test="${not empty sessionScope.mensaje_exito}">
+        <div class="alert alert-success alert-dismissible fade show shadow-sm d-flex align-items-center" role="alert">
+            <i class="bi bi-check-circle-fill fs-4 me-2"></i>
+            <div><c:out value="${sessionScope.mensaje_exito}" /></div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+        <c:remove var="mensaje_exito" scope="session" />
+    </c:if>
+
+    <c:if test="${not empty sessionScope.mensaje_error}">
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm d-flex align-items-center" role="alert">
+            <i class="bi bi-exclamation-triangle-fill fs-4 me-2"></i>
+            <div><c:out value="${sessionScope.mensaje_error}" /></div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+        <c:remove var="mensaje_error" scope="session" />
+    </c:if>
+
+    <c:if test="${not empty sessionScope.mensaje_info}">
+        <div class="alert alert-info alert-dismissible fade show shadow-sm d-flex align-items-center" role="alert">
+            <i class="bi bi-info-circle-fill fs-4 me-2"></i>
+            <div><c:out value="${sessionScope.mensaje_info}" /></div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+        <c:remove var="mensaje_info" scope="session" />
+    </c:if>
+</div>

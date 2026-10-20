@@ -1,0 +1,693 @@
+/* =====================================================================
+   ORYZO AI STYLE REFERENCE — UTS TRABAJOS DE GRADO (GREEN EDITION)
+   Theme: Darkroom Editorial / Dark Mode
+   Prioritizing: UTS Institutional Green (#006633)
+   
+   Palette:
+     Warm Cream:      #ffedd7 (Foreground text, captions, display type)
+     Cream Muted:     #d4c5b3 (Secondary body copy, subtitles)
+     Void Dark:       #0b140e (Page canvas & deepest background)
+     Surface Elev.:   #132219 (Elevated card, modal & table surface)
+     Surface Hover:   #192c20 (Hover state on rows and cards)
+     UTS Green:       #006633 (Primary brand CTA & solid actions)
+     UTS Green Light: #008744 (Hover/interactive green)
+     UTS Green Dark:  #004d26 (Deep forest gradient)
+     Cork Border:     #233b2c (1px structural and dashed dividers)
+     Driftwood:       #3a5c47 (Secondary structural borders)
+     Ember Accent:    #dc5000 (Editorial credit and highlight tag)
+
+   Geometry:
+     Cards:           12px
+     Inputs:          0px (Underline minimal form controls)
+     Full-Round:      9999px
+     Buttons Pill:    36px (Filled CTA)
+     Buttons Outlined:22.5px (Ghost secondary)
+   ===================================================================== */
+
+:root {
+    --color-warm-cream: #ffedd7;
+    --color-cream-muted: #d4c5b3;
+    --color-void-dark: #0b140e;
+    --color-surface-elevated: #132219;
+    --color-surface-hover: #192c20;
+    --color-uts-green: #006633;
+    --color-uts-green-light: #008744;
+    --color-uts-green-dark: #004d26;
+    --color-border-cork: #233b2c;
+    --color-border-driftwood: #3a5c47;
+    --color-ember-accent: #dc5000;
+    
+    --radius-cards: 12px;
+    --radius-inputs: 0px;
+    --radius-full-round: 9999px;
+    --radius-buttons-pill: 36px;
+    --radius-buttons-outlined: 22.5px;
+    
+    --font-oryzo: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, Inter, Roboto, sans-serif;
+}
+
+/* Base Canvas */
+html, body {
+    background-color: var(--color-void-dark) !important;
+    color: var(--color-warm-cream) !important;
+    font-family: var(--font-oryzo);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1 0 auto;
+    background-color: var(--color-void-dark);
+}
+
+/* Typography Voice 1: UPPERCASE WEIGHT 500 (Museum / Editorial) */
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6 {
+    color: var(--color-warm-cream) !important;
+    font-weight: 500 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.04em !important;
+}
+
+/* Typography Voice 2: MIXED CASE WEIGHT 400 (Body Descriptions) */
+p, .card-body p, .text-muted, .text-secondary {
+    font-weight: 400;
+    color: var(--color-cream-muted) !important;
+    letter-spacing: normal;
+}
+
+.text-dark {
+    color: var(--color-warm-cream) !important;
+}
+
+.text-white {
+    color: #ffffff !important;
+}
+
+.text-white-50 {
+    color: rgba(255, 237, 215, 0.7) !important;
+}
+
+a {
+    color: var(--color-warm-cream);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: color 0.15s ease, opacity 0.15s ease;
+}
+
+a:hover {
+    color: var(--color-warm-cream);
+    opacity: 0.8;
+}
+
+/* =====================================================================
+   GLOBAL NAVIGATION (Barra Verde Institucional UTS - ORYZO Edition)
+   ===================================================================== */
+.navbar-uts, nav.navbar.navbar-uts {
+    background: #006633 !important;
+    background: linear-gradient(135deg, #006633 0%, #004d26 100%) !important;
+    border-bottom: 1px dashed var(--color-border-cork) !important;
+    box-shadow: none !important;
+    min-height: 52px;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+}
+
+.navbar-uts .navbar-brand-title {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--color-warm-cream) !important;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.navbar-uts .navbar-brand-subtitle {
+    font-size: 0.65rem;
+    color: rgba(255, 237, 215, 0.75) !important;
+    display: block;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+/* Enlaces del menú superior en Warm Cream uppercase */
+.navbar-uts .navbar-nav .nav-link,
+.navbar-uts .nav-link,
+.navbar-uts .navbar-nav .nav-link i {
+    color: var(--color-warm-cream) !important;
+    font-weight: 500 !important;
+    font-size: 0.82rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    padding: 0.4rem 0.85rem !important;
+    border-radius: var(--radius-buttons-outlined);
+    text-decoration: none !important;
+    opacity: 0.88;
+    transition: all 0.2s ease-in-out;
+}
+
+.navbar-uts .navbar-nav .nav-link:hover,
+.navbar-uts .nav-link:hover {
+    opacity: 1 !important;
+    color: var(--color-warm-cream) !important;
+    background-color: rgba(255, 237, 215, 0.12) !important;
+}
+
+.navbar-uts .navbar-nav .nav-link.active,
+.navbar-uts .nav-link.active {
+    opacity: 1 !important;
+    color: var(--color-warm-cream) !important;
+    border-bottom: 2px dashed var(--color-warm-cream) !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    font-weight: 600 !important;
+}
+
+.navbar-uts .text-dark,
+.navbar-uts .fw-semibold {
+    color: var(--color-warm-cream) !important;
+}
+
+.navbar-uts .text-secondary {
+    color: rgba(255, 237, 215, 0.75) !important;
+}
+
+/* Botón Salir / Acceso en barra */
+.navbar-uts .btn-outline-light {
+    border: 1px solid var(--color-warm-cream) !important;
+    color: var(--color-warm-cream) !important;
+    background: transparent !important;
+    border-radius: var(--radius-buttons-outlined) !important;
+    font-size: 0.8rem !important;
+    font-weight: 500 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    padding: 0.35rem 1rem !important;
+}
+
+.navbar-uts .btn-outline-light:hover {
+    background: rgba(255, 237, 215, 0.18) !important;
+    color: var(--color-warm-cream) !important;
+}
+
+.navbar-uts .navbar-toggler {
+    border: 1px dashed var(--color-warm-cream) !important;
+}
+
+.navbar-uts .navbar-toggler-icon {
+    filter: brightness(0) invert(1) !important;
+}
+
+/* =====================================================================
+   CARDS & CONTAINERS (ORYZO Dark Elevated Surfaces, 12px Radius)
+   ===================================================================== */
+.card-uts, .card {
+    background: var(--color-surface-elevated) !important;
+    border: 1px solid var(--color-border-cork) !important;
+    border-radius: var(--radius-cards) !important;
+    box-shadow: none !important;
+    color: var(--color-warm-cream) !important;
+    overflow: hidden;
+}
+
+.card-uts:hover {
+    border-color: var(--color-border-driftwood) !important;
+}
+
+.card-uts .card-header, .card-header,
+.card-header-uts, .card-header-blue {
+    background: transparent !important;
+    border-bottom: 1px dashed var(--color-border-cork) !important;
+    color: var(--color-warm-cream) !important;
+    font-weight: 500 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    padding: 1.25rem 1.5rem !important;
+}
+
+.card-body {
+    padding: 1.5rem;
+    color: var(--color-warm-cream);
+}
+
+.card-footer {
+    background: rgba(0, 0, 0, 0.2) !important;
+    border-top: 1px dashed var(--color-border-cork) !important;
+    padding: 1rem 1.5rem !important;
+    color: var(--color-cream-muted) !important;
+}
+
+/* =====================================================================
+   BUTTONS (ORYZO Pill 36px Filled / 22.5px Ghost Outlined)
+   ===================================================================== */
+.btn {
+    text-transform: uppercase !important;
+    font-weight: 500 !important;
+    letter-spacing: 0.05em !important;
+    transition: all 0.2s ease !important;
+    box-shadow: none !important;
+}
+
+/* Primary CTA: Solid Filled UTS Green Pill (36px radius) */
+.btn-uts-primary, .btn-primary {
+    background-color: var(--color-uts-green) !important;
+    border: 1px solid var(--color-uts-green-light) !important;
+    color: var(--color-warm-cream) !important;
+    border-radius: var(--radius-buttons-pill) !important;
+    padding: 0.65rem 1.75rem !important;
+    font-size: 0.88rem !important;
+}
+
+.btn-uts-primary:hover, .btn-primary:hover {
+    background-color: var(--color-uts-green-light) !important;
+    border-color: var(--color-uts-green-light) !important;
+    color: #ffffff !important;
+}
+
+/* Secondary CTA: Ghost Outlined Button (22.5px radius) */
+.btn-uts-secondary, .btn-outline-secondary, .btn-outline-dark {
+    background-color: transparent !important;
+    border: 1px solid var(--color-warm-cream) !important;
+    color: var(--color-warm-cream) !important;
+    border-radius: var(--radius-buttons-outlined) !important;
+    padding: 0.55rem 1.35rem !important;
+    font-size: 0.84rem !important;
+}
+
+.btn-uts-secondary:hover, .btn-outline-secondary:hover, .btn-outline-dark:hover {
+    background-color: rgba(255, 237, 215, 0.12) !important;
+    border-color: var(--color-warm-cream) !important;
+    color: var(--color-warm-cream) !important;
+}
+
+.btn-outline-primary {
+    background-color: transparent !important;
+    border: 1px solid var(--color-uts-green-light) !important;
+    color: #86efac !important;
+    border-radius: var(--radius-buttons-outlined) !important;
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--color-uts-green) !important;
+    color: var(--color-warm-cream) !important;
+}
+
+.btn-sm {
+    padding: 0.35rem 0.95rem !important;
+    font-size: 0.76rem !important;
+    border-radius: var(--radius-buttons-outlined) !important;
+}
+
+.btn-lg {
+    padding: 0.8rem 2.2rem !important;
+    font-size: 0.95rem !important;
+    border-radius: var(--radius-buttons-pill) !important;
+}
+
+/* Grupo de botones */
+.btn-group {
+    display: inline-flex;
+    gap: 4px;
+}
+.btn-group .btn {
+    border-radius: var(--radius-buttons-outlined) !important;
+}
+
+/* =====================================================================
+   FORM CONTROLS (ORYZO Underline Minimal Inputs - 0px Radius)
+   ===================================================================== */
+.form-control, .form-select {
+    border-radius: var(--radius-inputs) !important;
+    background-color: transparent !important;
+    border: none !important;
+    border-bottom: 1px solid var(--color-border-driftwood) !important;
+    color: var(--color-warm-cream) !important;
+    padding: 0.65rem 0.25rem !important;
+    font-size: 0.92rem;
+    transition: border-color 0.2s ease;
+}
+
+.form-select option {
+    background-color: var(--color-surface-elevated);
+    color: var(--color-warm-cream);
+}
+
+textarea.form-control {
+    border: 1px dashed var(--color-border-cork) !important;
+    border-radius: var(--radius-cards) !important;
+    padding: 0.75rem 1rem !important;
+    background-color: rgba(0, 0, 0, 0.2) !important;
+}
+
+.form-control:focus, .form-select:focus {
+    background-color: transparent !important;
+    color: var(--color-warm-cream) !important;
+    border-bottom: 1px solid var(--color-warm-cream) !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+.form-control::placeholder {
+    color: rgba(212, 197, 179, 0.45);
+}
+
+.form-label {
+    font-size: 0.76rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-warm-cream);
+    margin-bottom: 0.4rem;
+}
+
+.form-text {
+    font-size: 0.78rem;
+    color: var(--color-cream-muted);
+}
+
+.input-group-text {
+    background-color: transparent !important;
+    border: none !important;
+    border-bottom: 1px solid var(--color-border-driftwood) !important;
+    color: var(--color-cream-muted) !important;
+    border-radius: 0px !important;
+}
+
+/* =====================================================================
+   TABLES (ORYZO Dark Surface Grid with Dashed Dividers)
+   ===================================================================== */
+.table-responsive {
+    border-radius: var(--radius-cards);
+    border: 1px solid var(--color-border-cork);
+}
+
+.table {
+    color: var(--color-warm-cream) !important;
+    margin-bottom: 0;
+    background-color: var(--color-surface-elevated) !important;
+}
+
+.table-light, thead.table-light, thead.table-light th, thead th {
+    background-color: #0d1a12 !important;
+    color: var(--color-warm-cream) !important;
+}
+
+.bg-white, .bg-light {
+    background-color: rgba(0, 0, 0, 0.25) !important;
+    color: var(--color-warm-cream) !important;
+}
+
+.border {
+    border-color: var(--color-border-cork) !important;
+}
+
+.table thead th {
+    background-color: #0d1a12 !important;
+    color: var(--color-warm-cream) !important;
+    font-size: 0.74rem !important;
+    font-weight: 500 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.06em;
+    padding: 0.95rem 1.25rem !important;
+    border-bottom: 1px dashed var(--color-border-cork) !important;
+    border-top: none;
+}
+
+.table tbody td {
+    padding: 1rem 1.25rem !important;
+    border-bottom: 1px dashed var(--color-border-cork) !important;
+    color: var(--color-warm-cream) !important;
+    vertical-align: middle;
+    font-size: 0.88rem;
+    background-color: transparent !important;
+}
+
+.table tbody tr:last-child td {
+    border-bottom: none !important;
+}
+
+.table tbody tr:hover td {
+    background-color: var(--color-surface-hover) !important;
+}
+
+code {
+    color: #86efac;
+    background-color: rgba(0, 0, 0, 0.35);
+    padding: 0.2em 0.5em;
+    border-radius: 4px;
+    border: 1px solid var(--color-border-cork);
+}
+
+/* =====================================================================
+   BADGES (ORYZO Pill Accents)
+   ===================================================================== */
+.badge {
+    border-radius: var(--radius-full-round) !important;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.badge-rol {
+    font-size: 0.72rem;
+    font-weight: 500;
+    padding: 0.35em 0.85em;
+    border-radius: var(--radius-full-round);
+    display: inline-flex;
+    align-items: center;
+}
+
+.badge-rol-ADMIN {
+    background-color: #2b1315 !important;
+    color: #fca5a5 !important;
+    border: 1px solid #7f1d1d;
+}
+
+.badge-rol-COORDINACION {
+    background-color: #231633 !important;
+    color: #e9d5ff !important;
+    border: 1px solid #6b21a8;
+}
+
+.badge-rol-DIRECTOR {
+    background-color: #0f2233 !important;
+    color: #bae6fd !important;
+    border: 1px solid #0369a1;
+}
+
+.badge-rol-EVALUADOR {
+    background-color: #0f2629 !important;
+    color: #a5f3fc !important;
+    border: 1px solid #0e7490;
+}
+
+.badge-rol-ESTUDIANTE {
+    background-color: #0c2b18 !important;
+    color: #86efac !important;
+    border: 1px solid #15803d;
+}
+
+/* Estados del Proyecto */
+.badge-estado {
+    padding: 0.4em 0.9em;
+    font-size: 0.76rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-radius: var(--radius-full-round);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    white-space: nowrap;
+}
+
+.badge-estado-idea-seleccionada { background-color: #1f2937; color: #d1d5db; border: 1px solid #374151; }
+.badge-estado-anteproyecto-radicado { background-color: #0f2233; color: #93c5fd; border: 1px solid #1d4ed8; }
+.badge-estado-en-revision-por-director,
+.badge-estado-en-revisión-por-director { background-color: #2e1f0c; color: #fde047; border: 1px solid #a16207; }
+.badge-estado-devuelto-con-observaciones { background-color: #33150c; color: #fdba74; border: 1px solid #c2410c; }
+.badge-estado-aprobado-por-director { background-color: #0c2b18; color: #86efac; border: 1px solid #15803d; }
+.badge-estado-en-revision-por-evaluador,
+.badge-estado-en-revisión-por-evaluador { background-color: #231633; color: #e9d5ff; border: 1px solid #7e22ce; }
+.badge-estado-aprobado { background-color: #0c2b18; color: #86efac; border: 1px solid #22c55e; font-weight: 600; }
+.badge-estado-rechazado { background-color: #2b1315; color: #fca5a5; border: 1px solid #b91c1c; }
+.badge-estado-en-desarrollo { background-color: #0f2629; color: #67e8f9; border: 1px solid #0891b2; }
+.badge-estado-documento-final-entregado { background-color: #2d132b; color: #f0abfc; border: 1px solid #a21caf; }
+.badge-estado-sustentado { background-color: #0c2b18; color: #a7f3d0; border: 1px solid #10b981; font-weight: 600; }
+
+/* Badges sutiles de Bootstrap en modo oscuro */
+.bg-success-subtle { background-color: #0c2b18 !important; color: #86efac !important; border-color: #15803d !important; }
+.bg-danger-subtle { background-color: #2b1315 !important; color: #fca5a5 !important; border-color: #991b1b !important; }
+.bg-warning-subtle { background-color: #2e1f0c !important; color: #fde047 !important; border-color: #a16207 !important; }
+.bg-info-subtle { background-color: #0f2233 !important; color: #bae6fd !important; border-color: #0369a1 !important; }
+.bg-secondary-subtle { background-color: #1a221d !important; color: #d4c5b3 !important; border-color: #2a3d31 !important; }
+.bg-primary-subtle { background-color: #0c2b18 !important; color: #86efac !important; border-color: #15803d !important; }
+
+/* =====================================================================
+   KPI DASHBOARD CARDS (ORYZO Two-Step Depth)
+   ===================================================================== */
+.kpi-card {
+    border-radius: var(--radius-cards) !important;
+    background: var(--color-surface-elevated) !important;
+    border: 1px solid var(--color-border-cork) !important;
+    padding: 1.6rem !important;
+    box-shadow: none !important;
+    border-left: none !important;
+    transition: border-color 0.2s ease;
+}
+
+.kpi-card:hover {
+    border-color: var(--color-border-driftwood) !important;
+}
+
+.kpi-value {
+    font-size: 2.25rem;
+    font-weight: 500;
+    line-height: 0.9;
+    color: var(--color-warm-cream);
+    letter-spacing: -0.02em;
+}
+
+.kpi-label {
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--color-cream-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.85rem;
+}
+
+/* =====================================================================
+   MODALS & ALERTS (ORYZO Darkroom Theme)
+   ===================================================================== */
+.modal-content {
+    background-color: var(--color-surface-elevated) !important;
+    border-radius: var(--radius-cards) !important;
+    border: 1px solid var(--color-border-driftwood) !important;
+    color: var(--color-warm-cream) !important;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6) !important;
+}
+
+.modal-header {
+    border-bottom: 1px dashed var(--color-border-cork) !important;
+    padding: 1.25rem 1.5rem !important;
+    background: transparent !important;
+}
+
+.modal-footer {
+    border-top: 1px dashed var(--color-border-cork) !important;
+    padding: 1rem 1.5rem !important;
+    background: rgba(0, 0, 0, 0.25) !important;
+}
+
+.btn-close {
+    filter: invert(1) !important;
+}
+
+.alert {
+    border-radius: var(--radius-cards) !important;
+    padding: 1rem 1.25rem;
+    font-size: 0.88rem;
+    box-shadow: none !important;
+}
+
+.alert-success {
+    background-color: #0c2b18 !important;
+    color: #86efac !important;
+    border: 1px dashed #15803d !important;
+}
+
+.alert-danger {
+    background-color: #2b1315 !important;
+    color: #fca5a5 !important;
+    border: 1px dashed #991b1b !important;
+}
+
+.alert-info {
+    background-color: #0f2233 !important;
+    color: #bae6fd !important;
+    border: 1px dashed #0369a1 !important;
+}
+
+.alert-warning {
+    background-color: #2e1f0c !important;
+    color: #fde047 !important;
+    border: 1px dashed #a16207 !important;
+}
+
+/* =====================================================================
+   TIMELINE (ORYZO Hairline Dashed)
+   ===================================================================== */
+.timeline {
+    position: relative;
+    padding: 1.5rem 0 1.5rem 2rem;
+    list-style: none;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 28px;
+    width: 1px;
+    border-left: 1px dashed var(--color-border-driftwood);
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 1.75rem;
+}
+
+.timeline-icon {
+    position: absolute;
+    left: -2rem;
+    top: 0.15rem;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--color-uts-green);
+    color: var(--color-warm-cream);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    border: 2px solid var(--color-void-dark);
+}
+
+/* =====================================================================
+   FOOTER (Barra Inferior Verde Institucional UTS - ORYZO Edition)
+   ===================================================================== */
+.footer-uts, footer.footer-uts {
+    background: #004d26 !important;
+    background: linear-gradient(135deg, #004d26 0%, #006633 100%) !important;
+    color: var(--color-warm-cream) !important;
+    padding: 2.5rem 0 !important;
+    margin-top: 4rem !important;
+    border-top: 1px dashed var(--color-border-cork) !important;
+    font-size: 0.82rem;
+}
+
+.footer-uts strong {
+    color: var(--color-warm-cream) !important;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.footer-uts small {
+    color: rgba(255, 237, 215, 0.75) !important;
+}
+
+.footer-uts a {
+    color: var(--color-warm-cream) !important;
+    text-decoration: underline;
+}
+
+/* Dashed divider helper */
+.dashed-divider {
+    border-bottom: 1px dashed var(--color-border-cork);
+    margin: 1.5rem 0;
+}

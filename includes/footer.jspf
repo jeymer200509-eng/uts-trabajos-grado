@@ -1,0 +1,32 @@
+<%@ page pageEncoding="UTF-8" %>
+</main>
+<footer class="footer-uts mt-5" style="background: #004d26 !important; background: linear-gradient(135deg, #004d26 0%, #006633 100%) !important; color: #ffffff !important; border-top: 3px solid #73a942 !important;">
+    <div class="container-fluid px-lg-4">
+        <div class="row align-items-center gy-3">
+            <div class="col-md-6 text-center text-md-start">
+                <div class="d-flex align-items-center justify-content-center justify-content-md-start gap-2 mb-1">
+                    <i class="bi bi-mortarboard-fill fs-5 text-white"></i>
+                    <strong class="text-white">Unidades Tecnológicas de Santander - UTS</strong>
+                </div>
+                <small class="text-white-50 d-block">
+                    Sistema de Gestión y Seguimiento de Trabajos de Grado &bull; Facultad de Ciencias Naturales e Ingenierías
+                </small>
+            </div>
+            <div class="col-md-6 text-center text-md-end">
+                <small class="text-white-50">
+                    Bucaramanga, Santander &bull; Calle 45 No. 9 - 84 &bull; PBX: (607) 6917700
+                </small>
+                <div class="mt-1">
+                    <span class="badge rounded-pill bg-white px-3 py-1 shadow-sm" style="color: #006633 !important; font-weight: 700;">JSTL 1.2 + JSP + EL + MySQL</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- Bootstrap 5.3 JS Bundle con Popper CDN -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+<!-- Funcionalidades y validaciones cliente -->
+<script src="${pageContext.request.contextPath}/js/validaciones.js"></script>
+</body>
+</html>
