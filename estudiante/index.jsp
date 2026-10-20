@@ -34,7 +34,8 @@
 </c:if>
 
 <%-- Lógica de desbloqueo progresivo de las 6 Fases --%>
-<c:set var="f1Completa" value="${tieneProyecto and not empty proy.enlace_desprendible}" />
+<c:set var="tieneDesprendible" value="${tieneProyecto and not empty proy.enlace_desprendible}" />
+<c:set var="f1Completa" value="${tieneDesprendible and proy.estado_pago == 'Aprobado'}" />
 <c:set var="f2Desbloqueada" value="${f1Completa}" />
 <c:set var="f2Completa" value="${f1Completa and not empty proy.enlace_documento and proy.enlace_documento != 'PENDIENTE' and proy.enlace_documento != 'https://drive.google.com/' and proy.estado != 'Idea seleccionada' and !(proy.estado == 'Devuelto con observaciones' and empty proy.enlace_documento_final)}" />
 <c:set var="f3Desbloqueada" value="${f2Completa}" />
@@ -103,39 +104,86 @@
 
         <div class="row g-4">
             <!-- =============================================================== -->
-            <!-- FASE 1: SUBIR DESPRENDIBLE DE PAGO                              -->
+            <!-- FASE 1: SUBIR DESPRENDIBLE DE PAGO (VALIDADO POR COORDINACIÓN)  -->
             <!-- =============================================================== -->
             <div class="col-12">
-                <div class="card card-uts shadow-sm border-start border-4 ${f1Completa ? 'border-start-success' : 'border-start-primary'}">
+                <div class="card card-uts shadow-sm border-start border-4 ${f1Completa ? 'border-start-success' : (tieneDesprendible and proy.estado_pago == 'Rechazado' ? 'border-start-danger' : 'border-start-primary')}">
                     <div class="card-header bg-white py-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
                         <div class="d-flex align-items-center gap-2">
-                            <span class="badge ${f1Completa ? 'bg-success' : 'bg-primary'} rounded-pill px-3 py-2">FASE 1</span>
-                            <h5 class="mb-0 fw-bold text-dark">Subir Desprendible de Pago (Derechos de Grado / Matrícula)</h5>
+                            <span class="badge ${f1Completa ? 'bg-success' : (tieneDesprendible and proy.estado_pago == 'Rechazado' ? 'bg-danger' : 'bg-primary')} rounded-pill px-3 py-2">FASE 1</span>
+                            <h5 class="mb-0 fw-bold text-dark">Subir Desprendible de Pago (Revisión por Coordinación)</h5>
                         </div>
-                        <span class="badge ${f1Completa ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-warning-subtle text-warning-emphasis border border-warning-subtle'} px-3 py-2">
-                            <i class="bi ${f1Completa ? 'bi-check-circle-fill' : 'bi-unlock-fill'} me-1"></i>
-                            <c:out value="${f1Completa ? 'Completada (Fase 2 Desbloqueada)' : 'Fase Inicial Activa'}" />
-                        </span>
+                        <c:choose>
+                            <c:when test="${f1Completa}">
+                                <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2">
+                                    <i class="bi bi-check-circle-fill me-1"></i>Aceptado por Coordinación (Fase 2 Desbloqueada)
+                                </span>
+                            </c:when>
+                            <c:when test="${tieneDesprendible and proy.estado_pago == 'En revisión'}">
+                                <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle px-3 py-2">
+                                    <i class="bi bi-hourglass-split me-1"></i>En Revisión por Coordinación
+                                </span>
+                            </c:when>
+                            <c:when test="${tieneDesprendible and proy.estado_pago == 'Rechazado'}">
+                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-2">
+                                    <i class="bi bi-x-circle-fill me-1"></i>Rechazado por Coordinación (Subir nuevamente)
+                                </span>
+                            </c:when>
+                            <c:otherwise>
+                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2">
+                                    <i class="bi bi-unlock-fill me-1"></i>Fase Inicial Activa
+                                </span>
+                            </c:otherwise>
+                        </c:choose>
                     </div>
                     <div class="card-body p-4">
                         <p class="text-secondary small mb-3">
-                            Para habilitar el envío de la propuesta al Director y las demás secciones del sistema, sube primero el enlace a tu <strong>desprendible de pago en formato PDF</strong> alojado en Google Drive o nube.
+                            Sube el enlace a tu <strong>desprendible de pago en formato PDF</strong> alojado en Google Drive o nube. Una vez subido, <strong>Coordinación</strong> revisará el PDF y lo aceptará o rechazará. Al ser aceptado, se desbloqueará la Fase 2.
                         </p>
+
+                        <c:if test="${tieneDesprendible and proy.estado_pago == 'En revisión'}">
+                            <div class="alert alert-warning py-2 small d-flex align-items-center mb-3">
+                                <i class="bi bi-clock-history fs-5 me-2"></i>
+                                <div>
+                                    <strong>Comprobante en revisión:</strong> Ya subiste tu desprendible de pago. El Coordinador revisará el PDF y, una vez lo acepte, se habilitará el envío de tu propuesta al Director.
+                                </div>
+                            </div>
+                        </c:if>
+
+                        <c:if test="${tieneDesprendible and proy.estado_pago == 'Rechazado'}">
+                            <div class="alert alert-danger py-2 small d-flex align-items-center mb-3">
+                                <i class="bi bi-exclamation-triangle-fill fs-5 me-2"></i>
+                                <div>
+                                    <strong>Desprendible rechazado por Coordinación:</strong> 
+                                    <c:out value="${not empty proy.observacion_pago ? proy.observacion_pago : 'El comprobante PDF no es válido o no es legible. Por favor sube un enlace corregido.'}" />
+                                </div>
+                            </div>
+                        </c:if>
+
+                        <c:if test="${f1Completa and not empty proy.observacion_pago}">
+                            <div class="alert alert-success py-2 small d-flex align-items-center mb-3">
+                                <i class="bi bi-check-circle-fill fs-5 me-2"></i>
+                                <div>
+                                    <strong>Observación de Coordinación:</strong> <c:out value="${proy.observacion_pago}" />
+                                </div>
+                            </div>
+                        </c:if>
+
                         <form action="${pageContext.request.contextPath}/estudiante/desprendible_guardar.jsp" method="POST" class="row g-2 align-items-center">
                             <div class="col-md-9">
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-file-earmark-pdf-fill text-danger"></i></span>
                                     <input type="url" name="enlace_desprendible" class="form-control" required
-                                           value="<c:out value='${f1Completa ? proy.enlace_desprendible : \"\"}' />"
+                                           value="<c:out value='${tieneDesprendible ? proy.enlace_desprendible : \"\"}' />"
                                            placeholder="https://drive.google.com/file/d/... (Enlace al PDF del desprendible de pago)"
                                            oninput="validarUrlDocumento(this)">
                                 </div>
                             </div>
                             <div class="col-md-3 d-flex gap-2">
                                 <button type="submit" class="btn ${f1Completa ? 'btn-outline-success' : 'btn-uts-primary'} w-100 fw-semibold">
-                                    <i class="bi bi-cloud-arrow-up-fill me-1"></i> <c:out value="${f1Completa ? 'Actualizar Link' : 'Subir Desprendible'}" />
+                                    <i class="bi bi-cloud-arrow-up-fill me-1"></i> <c:out value="${tieneDesprendible ? 'Actualizar Comprobante' : 'Subir Desprendible'}" />
                                 </button>
-                                <c:if test="${f1Completa}">
+                                <c:if test="${tieneDesprendible}">
                                     <a href="<c:out value='${proy.enlace_desprendible}' />" target="_blank" class="btn btn-outline-primary" title="Abrir Desprendible">
                                         <i class="bi bi-box-arrow-up-right"></i>
                                     </a>

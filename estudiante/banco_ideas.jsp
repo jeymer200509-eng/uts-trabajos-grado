@@ -12,13 +12,13 @@
 <%@ include file="/includes/header.jspf" %>
 <%@ include file="/includes/navbar.jspf" %>
 
-<%-- Verificar estado del proyecto y si ya subió el desprendible de pago (Fase 1) --%>
+<%-- Verificar estado del proyecto y si el desprendible de pago (Fase 1) ya fue aceptado por Coordinación --%>
 <sql:query var="qCheckEst" dataSource="${conn}">
-    SELECT id_anteproyecto, titulo, estado, enlace_desprendible, enlace_documento FROM anteproyectos WHERE id_estudiante = ?
+    SELECT id_anteproyecto, titulo, estado, enlace_desprendible, estado_pago, enlace_documento FROM anteproyectos WHERE id_estudiante = ?
     <sql:param value="${sessionScope.id_usuario}" />
 </sql:query>
 <c:set var="tieneRegistro" value="${qCheckEst.rowCount > 0}" />
-<c:set var="fase1Completa" value="${tieneRegistro and not empty qCheckEst.rows[0].enlace_desprendible}" />
+<c:set var="fase1Completa" value="${tieneRegistro and not empty qCheckEst.rows[0].enlace_desprendible and qCheckEst.rows[0].estado_pago == 'Aprobado'}" />
 <c:set var="yaEnvioPropuesta" value="${tieneRegistro and qCheckEst.rows[0].estado != 'Idea seleccionada' and qCheckEst.rows[0].enlace_documento != 'PENDIENTE'}" />
 
 <%-- Consultar ideas disponibles --%>

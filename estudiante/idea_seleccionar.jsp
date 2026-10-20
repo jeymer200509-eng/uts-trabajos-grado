@@ -13,14 +13,14 @@
     <c:redirect url="/estudiante/banco_ideas.jsp" />
 </c:if>
 
-<%-- 1. Validar que el estudiante haya completado Fase 1 (Desprendible de pago) y no tenga propuesta en curso avanzada --%>
+<%-- 1. Validar que el estudiante haya completado Fase 1 (Desprendible de pago aceptado por Coordinación) --%>
 <sql:query var="qCheck" dataSource="${conn}">
-    SELECT id_anteproyecto, estado, enlace_desprendible, enlace_documento FROM anteproyectos WHERE id_estudiante = ?
+    SELECT id_anteproyecto, estado, enlace_desprendible, estado_pago, enlace_documento FROM anteproyectos WHERE id_estudiante = ?
     <sql:param value="${sessionScope.id_usuario}" />
 </sql:query>
 
-<c:if test="${qCheck.rowCount == 0 or empty qCheck.rows[0].enlace_desprendible}">
-    <c:set var="mensaje_error" value="Fase bloqueada: Primero debes subir el desprendible de pago (Fase 1) antes de seleccionar una idea." scope="session" />
+<c:if test="${qCheck.rowCount == 0 or empty qCheck.rows[0].enlace_desprendible or qCheck.rows[0].estado_pago != 'Aprobado'}">
+    <c:set var="mensaje_error" value="Fase bloqueada: Primero debes subir el desprendible de pago (Fase 1) y esperar a que Coordinación lo acepte." scope="session" />
     <c:redirect url="/estudiante/index.jsp" />
 </c:if>
 

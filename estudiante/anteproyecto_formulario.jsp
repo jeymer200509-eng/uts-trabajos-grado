@@ -16,9 +16,9 @@
 
 <c:set var="existe" value="${qProy.rowCount > 0}" />
 
-<%-- Regla Fase 1: Debe haber subido primero el desprendible de pago --%>
-<c:if test="${!existe or empty qProy.rows[0].enlace_desprendible}">
-    <c:set var="mensaje_error" value="Fase bloqueada: Primero debes subir el desprendible de pago (Fase 1) para habilitar el envío de la propuesta al Director." scope="session" />
+<%-- Regla Fase 1: Debe haber subido primero el desprendible de pago y haber sido aceptado por Coordinación --%>
+<c:if test="${!existe or empty qProy.rows[0].enlace_desprendible or qProy.rows[0].estado_pago != 'Aprobado'}">
+    <c:set var="mensaje_error" value="Fase bloqueada: Tu desprendible de pago (Fase 1) debe ser subido y aceptado por Coordinación para habilitar el envío de la propuesta al Director." scope="session" />
     <c:redirect url="/estudiante/index.jsp" />
 </c:if>
 

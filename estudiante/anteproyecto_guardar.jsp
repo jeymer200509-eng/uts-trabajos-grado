@@ -21,14 +21,14 @@
 <c:set var="resumen" value="${fn:trim(param.resumen)}" />
 <c:set var="enlace" value="${fn:trim(param.enlace_documento)}" />
 
-<%-- Validar que haya completado Fase 1 (Desprendible de Pago) --%>
+<%-- Validar que haya completado Fase 1 (Desprendible de Pago aceptado por Coordinación) --%>
 <sql:query var="qProyEst" dataSource="${conn}">
-    SELECT id_anteproyecto, estado, enlace_desprendible, id_director FROM anteproyectos WHERE id_estudiante = ?
+    SELECT id_anteproyecto, estado, enlace_desprendible, estado_pago, id_director FROM anteproyectos WHERE id_estudiante = ?
     <sql:param value="${sessionScope.id_usuario}" />
 </sql:query>
 
-<c:if test="${qProyEst.rowCount == 0 or empty qProyEst.rows[0].enlace_desprendible}">
-    <c:set var="mensaje_error" value="Fase bloqueada: Primero debes subir el desprendible de pago (Fase 1)." scope="session" />
+<c:if test="${qProyEst.rowCount == 0 or empty qProyEst.rows[0].enlace_desprendible or qProyEst.rows[0].estado_pago != 'Aprobado'}">
+    <c:set var="mensaje_error" value="Fase bloqueada: Tu desprendible de pago (Fase 1) debe estar aceptado por Coordinación." scope="session" />
     <c:redirect url="/estudiante/index.jsp" />
 </c:if>
 

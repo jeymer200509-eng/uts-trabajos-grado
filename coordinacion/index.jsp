@@ -53,6 +53,9 @@
             <p class="text-secondary mb-0">Gestión de banco de ideas, asignación tutorial de jurados y seguimiento académico.</p>
         </div>
         <div class="d-flex flex-wrap gap-2">
+            <a href="${pageContext.request.contextPath}/coordinacion/pagos_listar.jsp" class="btn btn-success shadow-sm">
+                <i class="bi bi-receipt-cutoff me-1"></i> Validar Desprendibles de Pago
+            </a>
             <a href="${pageContext.request.contextPath}/coordinacion/ideas_formulario.jsp" class="btn btn-uts-primary shadow-sm">
                 <i class="bi bi-lightbulb-fill me-1"></i> Publicar Idea
             </a>
@@ -183,6 +186,13 @@
                     <h6 class="mb-0 fw-bold"><i class="bi bi-tools me-2"></i>Herramientas de Coordinación</h6>
                 </div>
                 <div class="list-group list-group-flush">
+                    <a href="${pageContext.request.contextPath}/coordinacion/pagos_listar.jsp" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3">
+                        <div>
+                            <div class="fw-bold"><i class="bi bi-receipt-cutoff text-success me-2"></i>Validar Desprendibles de Pago</div>
+                            <small class="text-muted">Aceptar o rechazar comprobantes PDF (Fase 1)</small>
+                        </div>
+                        <i class="bi bi-chevron-right text-muted"></i>
+                    </a>
                     <a href="${pageContext.request.contextPath}/coordinacion/ideas_listar.jsp" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3">
                         <div>
                             <div class="fw-bold"><i class="bi bi-lightbulb-fill text-warning me-2"></i>Banco de Ideas</div>

@@ -48,8 +48,8 @@
     password="${passVal}"
     scope="application" />
 
-<%-- Migración automática segura para columnas de documentos por fases (Local y Nube) --%>
-<c:if test="${empty applicationScope.db_migrated_fases}">
+<%-- Migración automática segura para columnas de documentos por fases y validación de pago (Local y Nube) --%>
+<c:if test="${empty applicationScope.db_migrated_pagos_v3}">
     <c:catch var="eMig1">
         <sql:update dataSource="${conn}">
             ALTER TABLE anteproyectos ADD COLUMN enlace_desprendible VARCHAR(500) NULL
@@ -70,14 +70,25 @@
             ALTER TABLE anteproyectos ADD COLUMN enlace_acta_final VARCHAR(500) NULL
         </sql:update>
     </c:catch>
+    <c:catch var="eMig5">
+        <sql:update dataSource="${conn}">
+            ALTER TABLE anteproyectos ADD COLUMN estado_pago VARCHAR(30) NOT NULL DEFAULT 'Pendiente'
+        </sql:update>
+    </c:catch>
+    <c:catch var="eMig6">
+        <sql:update dataSource="${conn}">
+            ALTER TABLE anteproyectos ADD COLUMN observacion_pago TEXT NULL
+        </sql:update>
+    </c:catch>
     <c:catch var="eMigSeed">
         <sql:update dataSource="${conn}">
             UPDATE anteproyectos 
-            SET enlace_desprendible = 'https://drive.google.com/file/d/1UTS_desprendible_pago_ejemplo/view'
-            WHERE enlace_desprendible IS NULL AND estado != 'Idea seleccionada'
+            SET enlace_desprendible = COALESCE(enlace_desprendible, 'https://drive.google.com/file/d/1UTS_desprendible_pago_ejemplo/view'),
+                estado_pago = 'Aprobado'
+            WHERE estado != 'Idea seleccionada' AND estado_pago = 'Pendiente'
         </sql:update>
     </c:catch>
-    <c:set var="db_migrated_fases" value="true" scope="application" />
+    <c:set var="db_migrated_pagos_v3" value="true" scope="application" />
 </c:if>
 
 

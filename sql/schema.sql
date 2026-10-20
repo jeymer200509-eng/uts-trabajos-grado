@@ -101,6 +101,8 @@ CREATE TABLE anteproyectos (
     resumen_documento_final TEXT NULL,
     fecha_entrega_final DATETIME NULL,
     enlace_desprendible VARCHAR(500) NULL,
+    estado_pago VARCHAR(30) NOT NULL DEFAULT 'Pendiente',
+    observacion_pago TEXT NULL,
     enlace_aval_director VARCHAR(500) NULL,
     enlace_informe_director VARCHAR(500) NULL,
     enlace_acta_final VARCHAR(500) NULL,

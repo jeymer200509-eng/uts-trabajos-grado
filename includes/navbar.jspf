@@ -59,6 +59,11 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link" href="${pageContext.request.contextPath}/coordinacion/pagos_listar.jsp">
+                                <i class="bi bi-receipt-cutoff"></i> Validar Pagos
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" href="${pageContext.request.contextPath}/coordinacion/ideas_listar.jsp">
                                 <i class="bi bi-lightbulb-fill"></i> Banco de Ideas
                             </a>
